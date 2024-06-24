@@ -1,0 +1,6 @@
+# pack-refs with: peeled fully-peeled sorted 
+703ef9380b30b05f19488c73ae2dfdcaae8e575d refs/remotes/origin/eventForChallenge
+6a0136fc563c57ef21159cda4283e250d4311ad8 refs/remotes/origin/frontend-mdk
+75d48302167138696ba095aa4cc48f7a594ca280 refs/remotes/origin/master
+90632b5b1cb934c2adc8ad93f3e3d61d715187ed refs/remotes/origin/pushNotification
+0062f0ac597666e7d8b9f68baa5e839b04495c6b refs/remotes/origin/waitingTimeFunctionality

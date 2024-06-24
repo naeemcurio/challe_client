@@ -1,0 +1,13 @@
+{
+    "sSearch": "Search",
+    "sZeroRecords": "No data available in table",
+    "sInfoEmpty": "Showing 0 of 0 entries",
+    "oPaginate": {
+        "sFirst": "First",
+        "sLast": "Last",
+        "sNext": "Next",
+        "sPrevious": "Previous"
+    },
+    "sLengthMenu": "Show _MENU_ entries",
+    "sInfo": "Showing _START_ to _END_ of  _TOTAL_ entries"
+}

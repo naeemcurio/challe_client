@@ -1,0 +1,13 @@
+{
+    "sSearch": "ძიება",
+    "sZeroRecords": "ცხრილში მონაცემები არ არის ხელმისაწვდომი",
+    "sInfoEmpty":     "ჩვენება 0 of 0 ჩანაწერები",
+    "oPaginate": {
+        "sFirst":    "\n\u1C9Eირველი",
+        "sLast":    "ბოლო",
+        "sNext":    "შემდეგი",
+        "sPrevious": "წინა"
+    },
+    "sLengthMenu":    "ჩვენება _MENU_ ჩანაწერები",
+    "sInfo": "ჩვენება _START_ რომ _END_ დან _TOTAL_ ჩანაწერები"
+}

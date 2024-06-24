@@ -1,0 +1,13 @@
+models:
+  Challenge:
+    title: string:400
+    description: nullable longtext
+    price: double
+    image: nullable string
+    video: nullable string
+    relationships:
+      belongsTo: User
+
+controllers:
+  Admin\Challenge:
+    resource

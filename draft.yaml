@@ -1,0 +1,7 @@
+models:
+  Price:
+    price: decimal:8,2
+
+controllers:
+  Admin\Price:
+    resource

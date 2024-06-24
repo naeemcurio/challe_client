@@ -1,0 +1,19 @@
+created:
+    - app/Http/Controllers/Admin/PriceController.php
+    - database/factories/PriceFactory.php
+    - database/migrations/2024_03_14_090028_create_prices_table.php
+    - app/Models/Price.php
+    - tests/Feature/Http/Controllers/Admin/PriceControllerTest.php
+    - app/Http/Requests/Admin/PriceStoreRequest.php
+    - app/Http/Requests/Admin/PriceUpdateRequest.php
+    - resources/views/price/index.blade.php
+    - resources/views/price/create.blade.php
+    - resources/views/price/show.blade.php
+    - resources/views/price/edit.blade.php
+updated:
+    - routes/web.php
+models:
+    Role: { name: string }
+    User: { full_name: 'string nullable', nick_name: 'string nullable', date_of_birth: 'string nullable', email: string, password: string, phone_number: 'string nullable', role_id: 'biginteger unsigned nullable', gender: 'string nullable', fcm_token: 'string nullable', provider: 'string nullable', provider_id: 'string nullable', image: 'string nullable', default_language: 'string nullable default:en', stripe_connected_account_id: 'string nullable', stripe_customer_id: 'string nullable', is_profile_complelte: 'boolean default:0', remember_token: 'string:100 nullable' }
+    Challenge: { title: 'string:400', description: 'nullable longtext', price: double, image: 'nullable string', video: 'nullable string', relationships: { belongsTo: User } }
+    Price: { price: 'decimal:8,2' }

@@ -1,0 +1,26 @@
+<?php
+
+return array (
+  'action' => 'მოქმედება',
+  'app_update' => 'აპის განახლება',
+  'date_of_birth' => 'Დაბადების თარიღი',
+  'default_language' => 'ნაგულისხმევი ენა',
+  'email' => 'ელფოსტა',
+  'fcm_token' => 'FCM ტოკენი',
+  'full_name' => 'Სრული სახელი',
+  'gender' => 'სქესი',
+  'general_notification' => 'ზოგადი შეტყობინება',
+  'new_service_available' => 'ახალი სერვისი ხელმისაწვდომია',
+  'new_tips_available' => 'ახალი რჩევები ხელმისაწვდომია',
+  'nick_name' => 'ნიკ სახელი',
+  'notification' => 'შეტყობინება',
+  'password' => 'პაროლი',
+  'phone_number' => 'Ტელეფონის ნომერი',
+  'profile_complete' => 'პროფილი დასრულებულია',
+  'profile_image' => 'პროფილის სურათი',
+  'provider' => 'პროვაიდერი',
+  'provider_id' => 'პროვაიდერის ID',
+  'sound' => 'ხმა',
+  'special_offer' => 'Სპეციალური შეთავაზება',
+  'wallet_amount' => 'საფულის თანხა',
+);

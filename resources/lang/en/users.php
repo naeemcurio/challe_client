@@ -1,0 +1,26 @@
+<?php
+
+return array (
+  'action' => 'Action',
+  'app_update' => 'App Update',
+  'date_of_birth' => 'Date of Birth',
+  'default_language' => 'Default Language',
+  'email' => 'Email',
+  'fcm_token' => 'FCM Token',
+  'full_name' => 'Full Name',
+  'gender' => 'Gender',
+  'general_notification' => 'General Notification',
+  'new_service_available' => 'New Service Available',
+  'new_tips_available' => 'New Tips Available',
+  'nick_name' => 'Nick Name',
+  'notification' => 'Notification',
+  'password' => 'Password',
+  'phone_number' => 'Phone Number',
+  'profile_complete' => 'Profile Complete',
+  'profile_image' => 'Profile Image',
+  'provider' => 'Provider',
+  'provider_id' => 'Provider ID',
+  'sound' => 'Sound',
+  'special_offer' => 'Special Offer',
+  'wallet_amount' => 'Wallet Amount',
+);
