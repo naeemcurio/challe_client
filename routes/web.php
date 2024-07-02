@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PriceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ChallengeController;
@@ -41,8 +42,9 @@ Route::get('cache_clear', function () {
 });
 
 
-Route::view('privacy-policy', 'privacy-policy')->name('privacyPolicy');
-Route::view('terms-and-conditions', 'terms-conditions')->name('termsAndConditions');
+Route::get('privacy-policy', [PageController::class, 'privacyPolicy'])
+    ->name('privacyPolicy');
+Route::get('terms-and-conditions', [PageController::class, 'termsAndConditions'])->name('termsAndConditions');
 Route::view('delete-user', 'authentication.delete_user')->name('deleteUserView');
 Route::post('delete-user',[AuthenticationController::class, 'deleteUser'])->name('deleteUser');
 

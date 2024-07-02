@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OnGoingChallengeController extends Controller
 {
@@ -178,12 +179,18 @@ class OnGoingChallengeController extends Controller
                 $title = __('challenge_response.sorry_title');
                 $message = __('challenge_response.sorry_body');
 
+                $findChallengeAttempt->makeHidden('winner','readyLounge','challenge');
+
                 $data = [
                     'challenge_attempt_id' => $findChallengeAttempt->id,
                     'challenge_id' => $findChallengeAttempt->challenge_id,
                     'challenge_attempt_record' => $findChallengeAttempt
                 ];
 
+
+
+//                Log::info('loser');
+//                Log::info($loser->fcm_token);
 
                 $this->announcement($loser->fcm_token, $title, $message, $notificationType, $data);
 
@@ -196,12 +203,16 @@ class OnGoingChallengeController extends Controller
             $title = __('challenge_response.congratulation_title');
             $message = __('challenge_response.congratulation_body') . ' ' . $findChallengeAttempt->winning_amount;
 
+            $findChallengeAttempt->makeHidden('winner','readyLounge','challenge');
+
             $data = [
                 'challenge_attempt_id' => $findChallengeAttempt->id,
                 'challenge_id' => $findChallengeAttempt->challenge_id,
                 'challenge_attempt_record' => $findChallengeAttempt
             ];
 
+//            Log::info('winner');
+//            Log::info($findChallengeAttempt->winner->fcm_token);
             $this->announcement($findChallengeAttempt->winner->fcm_token, $title, $message, $notificationType, $data);
         }
 

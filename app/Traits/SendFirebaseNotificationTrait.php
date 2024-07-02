@@ -4,6 +4,8 @@
 namespace App\Traits;
 
 
+use Illuminate\Support\Facades\Log;
+
 trait SendFirebaseNotificationTrait
 {
 
@@ -97,10 +99,12 @@ trait SendFirebaseNotificationTrait
         $response = $request->getBody();
         $response = json_decode($response);
 
-
         if ($response->success > 0) {
             return true;
         } else {
+
+//            Log::debug($response);
+
             return false;
         }
 

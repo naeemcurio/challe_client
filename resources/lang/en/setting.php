@@ -5,5 +5,6 @@ return array (
   'company_commission' => 'Company Commission',
   'in_percentage' => 'in percentage',
   'in_seconds' => 'in seconds',
+  'terms_conditions' => 'Terms and Conditions',
   'waiting_time' => 'waiting time',
 );

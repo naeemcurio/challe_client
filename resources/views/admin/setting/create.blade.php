@@ -6,6 +6,10 @@
 
 @endsection
 
+@section('style')
+    <link rel="stylesheet" href="{{asset('admin/css/trumbowyg.min.css')}}">
+@endsection
+
 
 @section('content')
     <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
@@ -59,6 +63,22 @@
                             </div><!-- Col -->
 
 
+                            <div class="col-sm-12">
+                                <div class="mb-3 innerDashboard-inputs">
+                                    <label class="form-label">{{ucfirst(__('title.privacy_policy'))}}</label>
+                                    <textarea class="form-control editor" name="privacy_policy">{{isset($data) ? $data->privacy_policy:''}}</textarea>
+                                </div>
+                            </div><!-- Col -->
+
+
+                            <div class="col-sm-12">
+                                <div class="mb-3 innerDashboard-inputs">
+                                    <label class="form-label">{{ucfirst(__('setting.terms_conditions'))}}</label>
+                                    <textarea class="form-control editor" name="terms_conditions">{{isset($data) ? $data->terms_conditions:''}}</textarea>
+                                </div>
+                            </div><!-- Col -->
+
+
 
                         </div>
 
@@ -82,9 +102,32 @@
 
 
 @section('script')
+
+    <script src="{{asset('admin/js/trumbowyg.min.js')}}"></script>
     <script>
 
         $(document).ready(function () {
+
+            $('.editor').trumbowyg({
+                semantic: {
+                    'div': 'div' // Editor does nothing on div tags now
+                },
+                btns: [
+                    ['viewHTML'],
+                    ['undo', 'redo'], // Only supported in Blink browsers
+                    ['formatting'],
+                    ['strong', 'em', 'del'],
+                    ['superscript', 'subscript'],
+                    ['link'],
+                    ['insertImage'],
+                    ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+                    ['unorderedList', 'orderedList'],
+                    ['horizontalRule'],
+                    ['removeformat'],
+                    ['fullscreen']
+                ]
+            });
+
 
             $('.createBtn').click(function () {
                 var data = $('#createForm').serialize();

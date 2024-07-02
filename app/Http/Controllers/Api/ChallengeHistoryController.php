@@ -25,7 +25,7 @@ class ChallengeHistoryController extends Controller
     public function history()
     {
         $allChallenges = ChallengeAttempt::where('challenger_1',Auth::user()->id)
-            ->orWhere('challenger_2',Auth::user()->id)->get();
+            ->orWhere('challenger_2',Auth::user()->id)->orderBy('id','desc')->get();
 
         $challengeArray = array();
         foreach($allChallenges as $challenge)

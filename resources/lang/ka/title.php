@@ -17,6 +17,7 @@ return array (
   'on_going_challenge' => 'მიმდინარე გამოწვევაზე',
   'payment_id' => 'გადახდის ID',
   'pending' => 'მომლოდინე',
+  'privacy_policy' => 'Კონფიდენციალურობის პოლიტიკა',
   'rating' => 'რეიტინგი',
   'ready_lounge_id' => 'Ready Lounge ID',
   'requestBy' => 'მოთხოვნა By',

@@ -18,6 +18,7 @@ return array (
   'on_going_challenge' => 'On Going Challenge',
   'payment_id' => 'Payment ID',
   'pending' => 'Pending',
+  'privacy_policy' => 'Privacy Policy',
   'rating' => 'Rating',
   'ready_lounge_id' => 'Ready Lounge ID',
   'requestBy' => 'Request By',

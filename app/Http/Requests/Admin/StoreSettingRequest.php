@@ -29,7 +29,9 @@ class StoreSettingRequest extends FormRequest
         return [
             'company_commission' => 'required',
             'challenge_creator_commission'  => 'required',
-            'waiting_time' => 'required|integer'
+            'waiting_time' => 'required|integer',
+            'privacy_policy' => 'nullable',
+            'terms_conditions' => 'nullable'
         ];
     }
 
