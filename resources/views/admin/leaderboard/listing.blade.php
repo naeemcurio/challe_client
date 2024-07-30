@@ -64,22 +64,22 @@
                                             <div class="leaderBoard-information ps-2">
                                                 <h3>{{$leaderBoard->user->full_name}}</h3>
                                                 <div class="leaderBoard-challenge-information">
-                                                    <div class="single-challenge-wrapper border-chelle ">
-                                                        <span class="single-title-view">{{__('on_going_challenge.total_views')}}</span>
-                                                        <span class="single-title-value">{{\App\Models\Leaderboard::abbreviateNumber($leaderBoard->total_views)}}</span>
-                                                    </div>
-                                                    <div class="single-challenge-wrapper border-chelle">
-                                                        <span class="single-title-view">{{__('on_going_challenge.total_likes')}}</span>
-                                                        <span class="single-title-value">{{\App\Models\Leaderboard::abbreviateNumber($leaderBoard->total_likes)}}</span>
-                                                    </div>
-                                                    <div class="single-challenge-wrapper border-chelle">
+{{--                                                    <div class="single-challenge-wrapper border-chelle ">--}}
+{{--                                                        <span class="single-title-view">{{__('on_going_challenge.total_views')}}</span>--}}
+{{--                                                        <span class="single-title-value">{{\App\Models\Leaderboard::abbreviateNumber($leaderBoard->total_views)}}</span>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="single-challenge-wrapper border-chelle">--}}
+{{--                                                        <span class="single-title-view">{{__('on_going_challenge.total_likes')}}</span>--}}
+{{--                                                        <span class="single-title-value">{{\App\Models\Leaderboard::abbreviateNumber($leaderBoard->total_likes)}}</span>--}}
+{{--                                                    </div>--}}
+                                                    <div class="single-challenge-wrapper">
                                                         <span class="single-title-view">{{__('on_going_challenge.challenges_participates')}}</span>
                                                         <span class="single-title-value">{{$leaderBoard->total_challenge_participation}}</span>
                                                     </div>
-                                                    <div class="single-challenge-wrapper">
-                                                        <span class="single-title-view">{{__('on_going_challenge.average_challenge_views')}}</span>
-                                                        <span class="single-title-value">{{$leaderBoard->total_views/$leaderBoard->total_challenge_participation}}</span>
-                                                    </div>
+{{--                                                    <div class="single-challenge-wrapper">--}}
+{{--                                                        <span class="single-title-view">{{__('on_going_challenge.average_challenge_views')}}</span>--}}
+{{--                                                        <span class="single-title-value">{{$leaderBoard->total_views/$leaderBoard->total_challenge_participation}}</span>--}}
+{{--                                                    </div>--}}
                                                 </div>
                                             </div>
                                         </div>

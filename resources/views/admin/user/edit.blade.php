@@ -126,7 +126,7 @@
                         </div>
 
                         <div class="text-end">
-                            <a href="{{route('users.index')}}" class="btn btn-outline-danger">
+                            <a href="{{route('challenge.index')}}" class="btn btn-outline-danger">
                                 {{__('actions.cancel')}}
                             </a>
 

@@ -64,63 +64,63 @@
                                             @endif
 
 {{--                                            <a href="#" class="btn btn-primary">Go somewhere</a>--}}
-                                            @if(!$challengeRecord->challengeResult)
-                                                <div class="text-center mb-4">
-                                                    <button
-                                                        class="primary-theme-btn submitResultBtn">
-                                                        {{__('actions.submit').' '.__('on_going_challenge.result')}}
-                                                    </button>
-                                                </div>
-                                            @endif
+{{--                                            @if(!$challengeRecord->challengeResult)--}}
+{{--                                                <div class="text-center mb-4">--}}
+{{--                                                    <button--}}
+{{--                                                        class="primary-theme-btn submitResultBtn">--}}
+{{--                                                        {{__('actions.submit').' '.__('on_going_challenge.result')}}--}}
+{{--                                                    </button>--}}
+{{--                                                </div>--}}
+{{--                                            @endif--}}
 
-                                            <div class="finding {{$challengeRecord->challengeResult ? "":'d-none'}}">
-                                                <form class="submitResultForm"
-                                                      action="{{route('on-going-challenge-result-submit',['on_going_challenge'=>$challengeAttempt->id,
-    'challenge_record_id'=>$challengeRecord->id,'challenge_id'=>$challengeAttempt->challenge_id,'challenger_id'=>$challengeRecord->challenger_id])}}">
-                                                    @csrf
+{{--                                            <div class="finding {{$challengeRecord->challengeResult ? "":'d-none'}}">--}}
+{{--                                                <form class="submitResultForm"--}}
+{{--                                                      action="{{route('on-going-challenge-result-submit',['on_going_challenge'=>$challengeAttempt->id,--}}
+{{--    'challenge_record_id'=>$challengeRecord->id,'challenge_id'=>$challengeAttempt->challenge_id,'challenger_id'=>$challengeRecord->challenger_id])}}">--}}
+{{--                                                    @csrf--}}
 
-                                                    <div class="row">
-                                                        <div class="col-sm-6">
-                                                            <div class="mb-3 innerDashboard-inputs">
-                                                                <label
-                                                                    class="form-label">{{__('on_going_challenge.total_likes')}}</label>
-                                                                <input type="text" name="likes"
-                                                                       {{$challengeRecord->challengeResult ? "readonly":''}} class="form-control likesField"
-                                                                       value="{{$challengeRecord->challengeResult ? $challengeRecord->challengeResult->likes:''}}"
-                                                                       placeholder="{{__('title.enter')}} {{__('on_going_challenge.total_likes')}}">
-                                                            </div>
-                                                        </div><!-- Col -->
+{{--                                                    <div class="row">--}}
+{{--                                                        <div class="col-sm-6">--}}
+{{--                                                            <div class="mb-3 innerDashboard-inputs">--}}
+{{--                                                                <label--}}
+{{--                                                                    class="form-label">{{__('on_going_challenge.total_likes')}}</label>--}}
+{{--                                                                <input type="text" name="likes"--}}
+{{--                                                                       {{$challengeRecord->challengeResult ? "readonly":''}} class="form-control likesField"--}}
+{{--                                                                       value="{{$challengeRecord->challengeResult ? $challengeRecord->challengeResult->likes:''}}"--}}
+{{--                                                                       placeholder="{{__('title.enter')}} {{__('on_going_challenge.total_likes')}}">--}}
+{{--                                                            </div>--}}
+{{--                                                        </div><!-- Col -->--}}
 
-                                                        <div class="col-sm-6">
-                                                            <div class="mb-3 innerDashboard-inputs">
-                                                                <label
-                                                                    class="form-label">{{__('on_going_challenge.total_views')}}</label>
-                                                                <input type="text" name="views"
-                                                                       {{$challengeRecord->challengeResult ? "readonly":''}} class="form-control viewField"
-                                                                       value="{{$challengeRecord->challengeResult ? $challengeRecord->challengeResult->views:''}}"
-                                                                       placeholder="{{__('title.enter')}} {{__('on_going_challenge.total_views')}}">
-                                                            </div>
-                                                        </div><!-- Col -->
-                                                        @if(!$challengeRecord->challengeResult)
-                                                            <div class="text-center">
-                                                                <button class="primary-theme-btn submit" type="button">
-                                                                    {{__('actions.submit')}}
-                                                                </button>
-                                                            </div>
-                                                        @endif
-
-
-                                                    </div>
+{{--                                                        <div class="col-sm-6">--}}
+{{--                                                            <div class="mb-3 innerDashboard-inputs">--}}
+{{--                                                                <label--}}
+{{--                                                                    class="form-label">{{__('on_going_challenge.total_views')}}</label>--}}
+{{--                                                                <input type="text" name="views"--}}
+{{--                                                                       {{$challengeRecord->challengeResult ? "readonly":''}} class="form-control viewField"--}}
+{{--                                                                       value="{{$challengeRecord->challengeResult ? $challengeRecord->challengeResult->views:''}}"--}}
+{{--                                                                       placeholder="{{__('title.enter')}} {{__('on_going_challenge.total_views')}}">--}}
+{{--                                                            </div>--}}
+{{--                                                        </div><!-- Col -->--}}
+{{--                                                        @if(!$challengeRecord->challengeResult)--}}
+{{--                                                            <div class="text-center">--}}
+{{--                                                                <button class="primary-theme-btn submit" type="button">--}}
+{{--                                                                    {{__('actions.submit')}}--}}
+{{--                                                                </button>--}}
+{{--                                                            </div>--}}
+{{--                                                        @endif--}}
 
 
-                                                </form>
+{{--                                                    </div>--}}
 
-                                            </div>
 
-                                            @if(!$challengeAttempt->winner_id && sizeof($challengeAttempt->challengeResults) > 0)
+{{--                                                </form>--}}
 
-                                                @foreach($challengeAttempt->challengeResults as $challengeResult)
-                                                    @if($challengeResult->challenger_id == $challengeRecord->challenger_id )
+{{--                                            </div>--}}
+
+{{--                                            @if(!$challengeAttempt->winner_id && sizeof($challengeAttempt->challengeResults) > 0)--}}
+
+{{--                                                @foreach($challengeAttempt->challengeResults as $challengeResult)--}}
+{{--                                                    @if($challengeResult->challenger_id == $challengeRecord->challenger_id )--}}
                                                         <div class="text-center mb-4">
                                                             <a href="{{route('on-going-challenge-mark-winner',['on_going_challenge'=>$challengeAttempt->id,'challenger_id'=>$challengeRecord->challenger_id])}}"
                                                                class="primary-theme-btn">
@@ -128,9 +128,9 @@
                                                             </a>
 
                                                         </div>
-                                                    @endif
-                                                @endforeach
-                                            @endif
+{{--                                                    @endif--}}
+{{--                                                @endforeach--}}
+{{--                                            @endif--}}
 
                                         </div>
 
