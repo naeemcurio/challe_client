@@ -105,14 +105,12 @@ class OnGoingChallengeController extends Controller
     {
         $findChallengeAttempt = ChallengeAttempt::find($challengeAttemptId);
         if (!$findChallengeAttempt) {
-            return redirect()->back()->with('success', __('response.message.invalid_challenge_attempt_id'));
-
+            return redirect()->back()->with('error', __('response.message.invalid_challenge_attempt_id'));
         }
 
         $findChallenger = User::find($challengerId);
         if (!$findChallenger) {
-            return redirect()->back()->with('success', __('response.message.invalid_challenger_id'));
-
+            return redirect()->back()->with('error', __('response.message.invalid_challenger_id'));
         }
 
         DB::beginTransaction();
@@ -131,9 +129,11 @@ class OnGoingChallengeController extends Controller
 
             if (!$leaderboard) {
                 $leaderboard = new Leaderboard();
+                $leaderboard->user_id = $findChallengeAttempt->winner_id;
             }
 
             $leaderboard->points = $leaderboard->points + 1;
+
 
             $leaderboard->save();
 

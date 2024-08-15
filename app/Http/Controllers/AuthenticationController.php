@@ -146,6 +146,14 @@ class AuthenticationController extends Controller
 
         //create User Token and Response
         try{
+            if ($saveUser && Auth::loginUsingId($saveUser->id)) {
+                Auth::user()->fcm_token = null;
+                Auth::user()->save();
+                Auth::guard('sanctum')->user()->tokens()->delete();
+                Session::flush();
+            }
+
+
             Auth::loginUsingId($saveUser->id);
             $token = Auth::user()->createToken('ChalleApp')->plainTextToken;
 

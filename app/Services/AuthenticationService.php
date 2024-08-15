@@ -33,6 +33,14 @@ class AuthenticationService
             return makeResponse('error', __('response_message.social_login_error'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        // Check if the user is already logged in
+        if ($findUser && Auth::loginUsingId($findUser->id)) {
+            Auth::user()->fcm_token = null;
+            Auth::user()->save();
+            Auth::guard('sanctum')->user()->tokens()->delete();
+            Session::flush();
+        }
+
         if ($request->remember_me) {
             $remember = true;
         }

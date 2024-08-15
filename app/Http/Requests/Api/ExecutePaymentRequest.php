@@ -30,7 +30,11 @@ class ExecutePaymentRequest extends FormRequest
             'price_id' => 'required|exists:prices,id',
 //            'card_id' => 'required_if:type,card',
             'type' => 'required',
-            'token' => 'required_if:type,card'
+            'token' => 'required_if:type,card',
+
+            'lat' => 'required',
+            'lng' => 'required',
+            'city' => 'nullable'
         ];
     }
 
@@ -42,6 +46,10 @@ class ExecutePaymentRequest extends FormRequest
 //            'card_id' => __('title.card_id'),
             'type' => __('title.type'),
             'token' => __('title.token'),
+
+            'lat' => __('title.lat'),
+            'lng' => __('title.lng'),
+            'city' => __('title.city'),
         ];
     }
 
@@ -53,6 +61,9 @@ class ExecutePaymentRequest extends FormRequest
 //            'card_id.required' => __('validation.required'),
             'type.required' => __('validation.required'),
             'token.required' => __('validation.required'),
+
+            'lat.required' => __('validation.required'),
+            'lng.required' => __('validation.required'),
         ];
     }
 

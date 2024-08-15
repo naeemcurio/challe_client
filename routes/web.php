@@ -22,6 +22,25 @@ use App\Http\Controllers\Admin\WithdrawController;
 |
 */
 
+use ElephantIO\Client;
+
+Route::get('test-socket', function () {
+
+    $url = 'http://localhost:8081';
+
+    $options = [
+        'transport' => 'websocket',
+    ];
+
+    $client = Client::create($url, $options);
+    $client->connect();
+
+    // emit an event to the server
+    $data = ['username' => 'my-user'];
+    $client->emit('statusEvent', $data);
+    return response()->json(['result' => 'success']);
+});
+
 Route::get('/migrate', function () {
     \Artisan::call('migrate');
     dd('migrated!');

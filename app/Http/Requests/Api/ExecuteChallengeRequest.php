@@ -30,7 +30,7 @@ class ExecuteChallengeRequest extends FormRequest
             'payment_id' => 'required|exists:user_payments,id',
             'lat' => 'required',
             'lng' => 'required',
-            'city' => 'required'
+            'city' => 'nullable'
         ];
     }
 

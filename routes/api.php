@@ -113,6 +113,10 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
 
         Route::get('delete-user',[AuthenticationController::class, 'deleteUserApi'])->name('deleteUser');
 
+        Route::get('refresh-challenge',[HomeController::class,'refresh'])->name('refresh');
+
+        Route::get('setting',[HomeController::class,'setting'])->name('setting');
+
     });
 });
 

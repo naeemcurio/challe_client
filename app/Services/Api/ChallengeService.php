@@ -10,13 +10,20 @@ use App\Models\Price;
 use App\Models\ReadyLounge;
 use App\Models\User;
 use App\Models\WaitingLounge;
+use App\Traits\SendFirebaseNotificationTrait;
+use App\Traits\SocketEventTrigger;
+use App\Traits\UserTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChallengeService
 {
+    use SendFirebaseNotificationTrait, UserTrait,SocketEventTrigger;
+
     public function getPopularPacksResponse($data)
     {
         $packArray = array();
@@ -168,8 +175,49 @@ class ChallengeService
 
         if ($attempt) {
             if (!isset($attempt['challenge_status'])) {
-                $attempt->load('challenge');
 
+                $attempt->load('challenge','readyLounge');
+
+                $timeLeft = 0;
+                $otherUserData = array();
+                if(isset($attempt->readyLounge))
+                {
+
+                    if ($attempt->readyLounge->user_1 == Auth::user()->id) {
+                        $otherUser = User::find($attempt->readyLounge->user_2);
+                    } elseif ($attempt->readyLounge->user_2 == Auth::user()->id) {
+                        $otherUser = User::find($attempt->readyLounge->user_1);
+                    }
+
+                    $otherUserData = [
+                        'id' => $otherUser->id,
+                        'image' => $otherUser->image,
+                        'full_name' => $otherUser->full_name,
+                        'nick_name' => $otherUser->nick_name,
+                        'phone_number' => $otherUser->phone_number,
+                        'email' => $otherUser->email
+                    ];
+
+
+                    $createdAt = Carbon::parse($attempt->readyLounge->created_at);
+                    $waitingTime = $attempt->readyLounge->waiting_time; // in seconds
+
+                    // Calculate the expiration time
+                    $expirationTime = $createdAt->copy()->addSeconds($waitingTime);
+
+                    // Get the current time
+                    $currentTime = Carbon::now();
+
+                    // Calculate the remaining time in seconds
+                    if ($currentTime->greaterThanOrEqualTo($expirationTime)) {
+                        // If the current time is past the expiration time, set timeLeft to 0
+                        $timeLeft = 0;
+                    } else {
+                        // Otherwise, calculate the remaining time
+                        $timeLeft = $currentTime->diffInSeconds($expirationTime, false);
+                    }
+
+                }
 
                 // Rename the loaded relationships
 //                $attempt->challenge->setRelation('price', $attempt->challenge->getRelation('priceRecord'));
@@ -182,11 +230,14 @@ class ChallengeService
                     'status' => 2,
                     'attempt' => $attempt,
 //                    'challenge' => $attempt->challenge,
-                    'price' => $attempt->challenge->priceRecord
+                    'price' => $attempt->challenge->priceRecord,
+                    'time_left' => $timeLeft,
+                    'otherUserData' => $otherUserData
                 ];
-            }
 
+            }
             return $response;
+
 
         }
 
@@ -196,6 +247,7 @@ class ChallengeService
     public function searchLounge()
     {
         $data = WaitingLounge::where('status', 0)->where('user_id', Auth::user()->id)
+            ->orderBy('id','desc')
             ->first();
 
         return $data;
@@ -212,6 +264,7 @@ class ChallengeService
                 $query->where('user_2', Auth::user()->id)
                     ->where('user2_status', 0);
             })
+            ->orderBy('id','desc')
             ->first();
 
 
@@ -225,18 +278,90 @@ class ChallengeService
                 ->orwhere('challenger_2', Auth::user()->id);
         })
             ->where('is_completed', 0)
+            ->orderBy('id','desc')
             ->first();
 
 
+
         if ($data) {
-            foreach ($data->challengeRecords as $record) {
-                if ($record->challenger_id == Auth::user()->id) {
+
+            if($data->readyLounge->user_1 == Auth::user()->id)
+            {
+                if($data->readyLounge->user1_status == 2)
+                {
                     $data['challenge_status'] = 'completed';
                 }
+
+                foreach ($data->challengeRecords as $record) {
+                    if ($record->challenger_id == Auth::user()->id) {
+                        $data['challenge_status'] = 'completed';
+                    }
+                }
+
             }
+
+            if($data->readyLounge->user_2 == Auth::user()->id)
+            {
+
+                if($data->readyLounge->user2_status == 2)
+                {
+                    $data['challenge_status'] = 'completed';
+                }
+
+                foreach ($data->challengeRecords as $key => $record) {
+                    if ($record->challenger_id == Auth::user()->id) {
+                        $data['challenge_status'] = 'completed';
+                    }
+                }
+
+
+
+            }
+
+
+
         }
 
         return $data;
+
+    }
+
+    public function saveRecordInWaitingLounge($getPayment,$request)
+    {
+        DB::beginTransaction();
+        try{
+            $wait = WaitingLounge::create([
+                'latitude' => $request->lat,
+                'longitude' => $request->lng,
+                'user_id' => Auth::user()->id,
+                'city' => $request->city,
+                'price_id' => $getPayment->price_id
+            ]);
+
+            $title = __('challenge_response.wait');
+            $message = __('challenge_response.wait_body');
+            $notificationType = 0;
+
+            if (Auth::user()->fcm_token) {
+                $this->waitNotification(Auth::user()->fcm_token, $title, $message, $notificationType);
+            }
+
+            $sendEvent = $this->eventEmit($title, $message, Auth::user()->id, $notificationType);
+
+            if(isset($sendEvent['result']) && $sendEvent['result'] == 'error')
+            {
+                Log::info($sendEvent['message']);
+            }
+            DB::commit();
+            return makeResponse('success', __('challenge_response.wait_body'), Response::HTTP_OK, ['waiting_lounge_id' => $wait->id]);
+        }
+        catch (\Exception $e)
+        {
+            DB::rollBack();
+            return makeResponse('error', __('response_message.error_message_line').' '.('response_message.record'),
+                Response::HTTP_INTERNAL_SERVER_ERROR);
+
+        }
 
     }
 

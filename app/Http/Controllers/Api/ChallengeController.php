@@ -21,17 +21,22 @@ use App\Models\UserPayment;
 use App\Models\WaitingLounge;
 use App\Services\Api\ChallengeService;
 use App\Traits\SendFirebaseNotificationTrait;
+use App\Traits\SocketEventTrigger;
 use App\Traits\UserTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use ElephantIO\Client;
+use ElephantIO\Engine\SocketIO\Version2X;
+
 
 class ChallengeController extends Controller
 {
-    use SendFirebaseNotificationTrait, UserTrait;
+    use SendFirebaseNotificationTrait, UserTrait, SocketEventTrigger;
 
     public $challengeService;
 
@@ -46,9 +51,11 @@ class ChallengeController extends Controller
         $this->challengeService = $service;
     }
 
-    public function execute(ExecuteChallengeRequest $request)
+
+    public function execute(Request $request)
     {
         DB::beginTransaction();
+
         $getPayment = UserPayment::where('user_id', Auth::user()->id)
             ->where('id', $request->payment_id)
             ->first();
@@ -61,131 +68,132 @@ class ChallengeController extends Controller
         $findInLounge = WaitingLounge::where('user_id', '!=', Auth::user()->id)
 //            ->where('longitude',$request->lng)
 //            ->where('latitude',$request->lat)
-            ->where('city', $request->city)
+//            ->where('city', $request->city)
             ->where('price_id', $getPayment->price_id)
             ->where('status', 0)
+            ->lockForUpdate()
             ->first();
 
         if (!$findInLounge) {
-            //match according to price
-            $findInLounge = WaitingLounge::where('price_id', $getPayment->price_id)
-                ->where('status', 0)
-                ->where('user_id', '!=', Auth::user()->id)
-                ->first();
-
-            if (!$findInLounge) {
-                $wait = WaitingLounge::create([
-                    'latitude' => $request->lat,
-                    'longitude' => $request->lng,
-                    'user_id' => Auth::user()->id,
-                    'city' => $request->city,
-                    'price_id' => $getPayment->price_id
-                ]);
-
-                $title = __('challenge_response.wait');
-                $message = __('challenge_response.wait_body');
-                $notificationType = 0;
-
-                if (Auth::user()->fcm_token) {
-                    $this->waitNotification(Auth::user()->fcm_token, $title, $message, $notificationType);
-                }
-
-                DB::commit();
-                return makeResponse('success', __('challenge_response.wait_body'), Response::HTTP_OK, ['waiting_lounge_id' => $wait->id]);
-            }
+            DB::commit();
+            //match according to price and save record in waiting lounge
+            return $this->challengeService->saveRecordInWaitingLounge($getPayment,$request);
         }
 
         $findInLounge->status = 1;
         $findInLounge->save();
 
+
+
+//        DB::beginTransaction();
+
         $getWaitingTime = Setting::first();
 
         $waitingTime = 0;
-        if($getWaitingTime)
-        {
+        if ($getWaitingTime) {
             $waitingTime = $getWaitingTime->waiting_time;
         }
 
-        $readyLounge = ReadyLounge::create([
-            'user_1' => $findInLounge->user_id,
-            'user_2' => Auth::user()->id,
-            'waiting_lounge_id' => $findInLounge->id,
-            'waiting_time' => $waitingTime
-        ]);
+        $readyLounge = ReadyLounge::where('waiting_lounge_id', $findInLounge->id)->first();
+
+        if (!$readyLounge) {
+            $readyLounge = ReadyLounge::create([
+                'user_1' => $findInLounge->user_id,
+                'user_2' => Auth::user()->id,
+                'waiting_lounge_id' => $findInLounge->id,
+                'waiting_time' => $waitingTime
+            ]);
 
 
-        $title = __('challenge_response.matched');
-        $message = __('challenge_response.matched_body');
-        $notificationType = 1;
+            $title = __('challenge_response.matched');
+            $message = __('challenge_response.matched_body');
+            $notificationType = 1;
 
-        $createdAt = Carbon::parse($readyLounge->created_at);
-        $waitingTime = $readyLounge->waiting_time; // in seconds
+            $createdAt = Carbon::parse($readyLounge->created_at);
+            $waitingTime = $readyLounge->waiting_time; // in seconds
 
-        // Calculate the expiration time
-        $expirationTime = $createdAt->copy()->addSeconds($waitingTime);
+            // Calculate the expiration time
+            $expirationTime = $createdAt->copy()->addSeconds($waitingTime);
 
-        // Get the current time
-        $currentTime = Carbon::now();
-
-
-        // Calculate the remaining time in seconds
-        if ($currentTime->greaterThanOrEqualTo($expirationTime)) {
-            // If the current time is past the expiration time, set timeLeft to 0
-            $timeLeft = 0;
-        } else {
-            // Otherwise, calculate the remaining time
-            $timeLeft = $currentTime->diffInSeconds($expirationTime, false);
-        }
+            // Get the current time
+            $currentTime = Carbon::now();
 
 
-        if ($readyLounge->user1->fcm_token) {
-            $userData = $this->fetchUserRecordForChallengeFromRelation($readyLounge->user2);
+            // Calculate the remaining time in seconds
+            if ($currentTime->greaterThanOrEqualTo($expirationTime)) {
+                // If the current time is past the expiration time, set timeLeft to 0
+                $timeLeft = 0;
+            } else {
+                // Otherwise, calculate the remaining time
+                $timeLeft = $currentTime->diffInSeconds($expirationTime, false);
+            }
+
+
+            if ($readyLounge->user1) {
+                $userData = $this->fetchUserRecordForChallengeFromRelation($readyLounge->user2);
+
+                $data = [
+                    'ready_lounge_id' => $readyLounge->id,
+                    'otherUserData' => $userData,
+                    'waiting_time' => $readyLounge->waiting_time,
+                    'created_at' => $createdAt->format('Y-m-d H:i:s'),
+                    'time_left' => $timeLeft < 0 ? 0 : $timeLeft
+                ];
+
+
+                if ($readyLounge->user1->fcm_token) {
+                    $this->getReady($readyLounge->user1->fcm_token, $title, $message, $notificationType, $data);
+
+                }
+
+                $sendEvent = $this->eventEmit($title, $message, $readyLounge->user1->id, $notificationType, $data);
+
+            }
+
+            if (Auth::user()) {
+                $userData = $this->fetchUserRecordForChallengeFromRelation($readyLounge->user1);
+
+                $data = [
+                    'ready_lounge_id' => $readyLounge->id,
+                    'otherUserData' => $userData,
+                    'waiting_time' => $readyLounge->waiting_time,
+                    'created_at' => $createdAt->format('Y-m-d H:i:s'),
+                    'time_left' => $timeLeft < 0 ? 0 : $timeLeft
+                ];
+                if (Auth::user()->fcm_token) {
+                    $this->getReady(Auth::user()->fcm_token, $title, $message, $notificationType, $data);
+                }
+
+                $sendEvent = $this->eventEmit($title, $message, Auth::user()->id, $notificationType, $data);
+
+            }
+
+            $otherUser = User::find($findInLounge->user_id);
+
+            $otherUserData = [
+                'id' => $otherUser->id,
+                'image' => $otherUser->image,
+                'full_name' => $otherUser->full_name,
+                'nick_name' => $otherUser->nick_name,
+                'phone_number' => $otherUser->phone_number,
+                'email' => $otherUser->email
+            ];
+
 
             $data = [
                 'ready_lounge_id' => $readyLounge->id,
-                'otherUserData' => $userData,
+                'otherUserData' => $otherUserData,
                 'waiting_time' => $readyLounge->waiting_time,
                 'created_at' => $createdAt->format('Y-m-d H:i:s'),
-                'time_left' => $timeLeft < 0 ? 0:$timeLeft
+                'time_left' => $timeLeft < 0 ? 0 : $timeLeft
             ];
 
-            $this->getReady($readyLounge->user1->fcm_token, $title, $message, $notificationType, $data);
         }
-
-        if (Auth::user()->fcm_token) {
-            $userData = $this->fetchUserRecordForChallengeFromRelation($readyLounge->user1);
-
-            $data = [
-                'ready_lounge_id' => $readyLounge->id,
-                'otherUserData' => $userData,
-                'waiting_time' => $readyLounge->waiting_time,
-                'created_at' => $createdAt->format('Y-m-d H:i:s'),
-                'time_left' => $timeLeft < 0 ? 0:$timeLeft
-            ];
-            $this->getReady(Auth::user()->fcm_token, $title, $message, $notificationType, $data);
+        else{
+            DB::commit();
+            //match according to price and save record in waiting lounge
+            return $this->challengeService->saveRecordInWaitingLounge($getPayment,$request);
         }
-
-        $otherUser = User::find($findInLounge->user_id);
-
-        $otherUserData = [
-            'id' => $otherUser->id,
-            'image' => $otherUser->image,
-            'full_name' => $otherUser->full_name,
-            'nick_name' => $otherUser->nick_name,
-            'phone_number' => $otherUser->phone_number,
-            'email' => $otherUser->email
-        ];
-
-
-
-        $data = [
-            'ready_lounge_id' => $readyLounge->id,
-            'otherUserData' => $otherUserData,
-            'waiting_time' => $readyLounge->waiting_time,
-            'created_at' => $createdAt->format('Y-m-d H:i:s'),
-            'time_left' => $timeLeft < 0 ? 0:$timeLeft
-        ];
-
 
         DB::commit();
         return makeResponse('success', __('challenge_response.matched_body'), Response::HTTP_OK, $data);
@@ -229,9 +237,13 @@ class ChallengeController extends Controller
                 $title = Auth::user()->full_name . ' ' . __('challenge_response.is_ready');
                 $message = Auth::user()->full_name . ' ' . __('challenge_response.is_ready_body');
                 $notificationType = 2;
+
                 if ($findUser->fcm_token) {
                     $this->waitNotification($findUser->fcm_token, $title, $message, $notificationType, $readyLoungeID);
                 }
+
+                $sendEvent = $this->eventEmit($title, $message, $findUser->id, $notificationType,$readyLoungeID);
+
             }
 
 
@@ -324,7 +336,7 @@ class ChallengeController extends Controller
             $status = 'in_challenge';
 
             if ($findChallengeAttempt->readyLounge->user_1 == Auth::user()->id) {
-                if ($findChallengeAttempt->readyLounge->user1_status == 2) {
+                if ($findChallengeAttempt->readyLounge->user2_status == 2) {
                     $status = 'forfeit';
                 }
             } elseif ($findChallengeAttempt->readyLounge->user_2 == Auth::user()->id) {
@@ -334,6 +346,7 @@ class ChallengeController extends Controller
             }
 
 
+
             if (Auth::user()->id == $findChallengeAttempt->challenger_1) {
                 $user = User::find($findChallengeAttempt->challenger_2);
             } else {
@@ -341,17 +354,24 @@ class ChallengeController extends Controller
             }
 
             if ($status == 'in_challenge') {
+
+                $title = __('challenge_response.record_submit_title');
+                $message = Auth::user()->full_name . ' ' . __('challenge_response.record_submit_body');
+                $notificationType = 4;
                 if ($user->fcm_token) {
-                    $title = __('challenge_response.record_submit_title');
-                    $message = Auth::user()->full_name . ' ' . __('challenge_response.record_submit_body');
-                    $notificationType = 4;
+
 
                     $this->recordSubmitNotification($user->fcm_token, $title, $message, $notificationType);
                 }
+
+                $sendEvent = $this->eventEmit($title, $message, $user->id, $notificationType);
+
                 if (sizeof($findChallengeAttempt->challengeRecords) >= 2) {
                     $findChallengeAttempt->is_completed = 1;
                     $findChallengeAttempt->save();
                 }
+
+
 
             }
 
@@ -360,6 +380,8 @@ class ChallengeController extends Controller
                 $findChallengeAttempt->is_completed = 1;
                 $findChallengeAttempt->save();
             }
+
+
 
 
             return makeResponse('success', __('response_message.record_save'), Response::HTTP_OK, $saveRecord);
@@ -469,14 +491,24 @@ class ChallengeController extends Controller
                 $challengeAttempt = $this->challengeService->saveRecordInChallengeAttempt($challenge, $readyLounge, 'forfeit');
             }
 
+
+
         } catch (\Exception $e) {
             DB::rollBack();
             return makeResponse('error', __('response_message.error_in_finding_challenge') . ': ' . $e, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        if($readyLounge->user2_status == 2 & $readyLounge->user1_status == 2)
+        {
+            $challengeAttempt->is_completed = 1;
+
+            $challengeAttempt->save();
         }
 
         DB::commit();
         return makeResponse('success', __('response_message.challenge_cancel_success'), Response::HTTP_OK);
 
     }
+
 
 }

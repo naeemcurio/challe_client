@@ -16,34 +16,6 @@
                 </div>
 
 
-
-                <!-- <div class="col-md-12 grid-margin">
-                    <div class="card rounded">
-                        <div class="card-body">
-                            @foreach($leaderBoards as $leaderBoard)
-                            <div class="d-flex justify-content-between mb-2 pb-2 {{$loop->last ? "":"border-bottom"}}">
-                                <div class="d-flex align-items-center hover-pointer">
-                                    <img class="img-xs rounded-circle"
-                                    src="{{$leaderBoard->user->image ? asset($leaderBoard->user->image):'https://via.placeholder.com/37x37'}}"
-                                    alt="">
-                                    <div class="ms-2">
-                                        <p>{{$leaderBoard->user->full_name}}</p>
-                                        <p class="tx-11 text-muted">{{__('on_going_challenge.total_views')}}: {{$leaderBoard->total_views}}</p>
-                                        <p class="tx-11 text-muted">{{__('on_going_challenge.total_likes')}}: {{$leaderBoard->total_likes}}</p>
-                                        <p class="tx-11 text-muted">{{__('on_going_challenge.challenges_participates')}}: {{$leaderBoard->total_challenge_participation}}</p>
-                                        <p class="tx-11 text-muted">{{__('on_going_challenge.average_challenge_views')}}: {{$leaderBoard->total_views/$leaderBoard->total_challenge_participation}}</p>
-
-
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div> -->
-
-
-
                 <div class="row">
                 <div class="col-lg-12">
                     <div class="leaderBoard-list-wrapper">

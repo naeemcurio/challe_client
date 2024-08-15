@@ -99,7 +99,7 @@ trait SendFirebaseNotificationTrait
         $response = $request->getBody();
         $response = json_decode($response);
 
-        if ($response->success > 0) {
+        if (isset($response->success) &&  $response->success > 0) {
             return true;
         } else {
 

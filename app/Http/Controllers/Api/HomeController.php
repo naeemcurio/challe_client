@@ -38,6 +38,8 @@ class HomeController extends Controller
 
         $checkForChallenge = $this->challengeService->checkForChallenge();
 
+//        Auth::user()->deposit('wallet_1',10000);
+
         $data = [
             'get_popular_packs' => $getPopularPacks,
             'top_rankers' => $topRankers,
@@ -85,6 +87,30 @@ class HomeController extends Controller
 
         return makeResponse('success', __('response_message.record_not_found'), Response::HTTP_NOT_FOUND);
 
+
+    }
+
+    public function refresh()
+    {
+        $checkForChallenge = $this->challengeService->checkForChallenge();
+
+        $data = [
+
+            'checkForChallenge' => $checkForChallenge
+        ];
+
+        return makeResponse('success', __('response_message.record_fetch'), Response::HTTP_OK, $data);
+
+    }
+
+    public function setting()
+    {
+        $stripe_key = env('STRIPE_KEY');
+
+        $data = ['stripe_key' => $stripe_key ];
+
+
+        return makeResponse('success', __('response_message.record_fetch'), Response::HTTP_OK, $data);
 
     }
 

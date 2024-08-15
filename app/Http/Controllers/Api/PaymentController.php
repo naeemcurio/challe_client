@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ExecutePaymentRequest;
 use App\Models\Price;
 use App\Models\UserPayment;
+use App\Services\Api\ChallengeService;
 use App\Services\PaymentGateway\RapydService;
 use App\Services\PaymentGateway\StripeService;
 use Illuminate\Http\Request;
@@ -48,7 +49,7 @@ class PaymentController extends Controller
             $savePayment->amount = $amount->price;
 
             $savePayment->fill(collect($request->validated())
-                ->except('card_id','type','token')->all());
+                ->except('card_id','type','token','lat','lng','city')->all());
 
             $savePayment->save();
 
@@ -90,11 +91,20 @@ class PaymentController extends Controller
 
         DB::commit();
 
-        $data = [
-            'payment_id' => $savePayment->id
-        ];
+//        $data = [
+//            'payment_id' => $savePayment->id
+//        ];
 
-        return makeResponse('success',__('response_message.payment_success'),Response::HTTP_OK,$data);
+
+        $request->merge(['payment_id' => $savePayment->id]);
+
+        $challengeService = new ChallengeService();
+        $challengeExecute = new ChallengeController($challengeService);
+
+
+        return  $challengeExecute->execute($request);
+
+//        return makeResponse('success',__('response_message.payment_success'),Response::HTTP_OK,$data);
     }
 
 
