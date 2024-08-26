@@ -16,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -156,6 +157,50 @@ class ChallengeController extends Controller
 
 
     }
+
+    public function removeImage(Request $request, $id)
+    {
+        $challenge = Challenge::findOrFail($id);
+
+        if ($challenge->image) {
+            try {
+                // Delete the image from storage
+                Storage::delete($challenge->image);
+                $challenge->image = null;
+                $challenge->save();
+
+                return makeResponse('success', __('challenge.image').' '.__('actions.delete').' '.__('actions.successfully'), Response::HTTP_OK);
+
+            } catch (\Exception $e) {
+                return makeResponse('error', __('response_message.delete_record_error').': '.$e, Response::HTTP_INTERNAL_SERVER_ERROR);
+
+            }
+        }
+        return makeResponse('error', __('response_message.record_not_found'), Response::HTTP_BAD_REQUEST);
+
+    }
+
+    public function removeVideo(Request $request, $id)
+    {
+        $challenge = Challenge::findOrFail($id);
+
+        if ($challenge->video) {
+            try {
+                // Delete the video from storage
+                Storage::delete($challenge->video);
+                $challenge->video = null;
+                $challenge->save();
+
+                return makeResponse('success', __('challenge.video').' '.__('actions.delete').' '.__('actions.successfully'), Response::HTTP_OK);
+
+            } catch (\Exception $e) {
+                return makeResponse('error', __('response_message.delete_record_error').': '.$e, Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return makeResponse('error', __('response_message.record_not_found'), Response::HTTP_BAD_REQUEST);
+    }
+
 
 
 

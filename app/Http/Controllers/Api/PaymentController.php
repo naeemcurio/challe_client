@@ -67,7 +67,7 @@ class PaymentController extends Controller
 
             try{
                 $executePayment = $payment->charge($savePayment->amount,$request->token);
-                if (isset($executePayment['result']) && $executePayment['result'] == 'error') {
+                if (isset($executePayment['type']) && $executePayment['type'] == 'error') {
                     return makeResponse('error', __('response_message.payment_error') . ': ' . $executePayment['message'], Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             }

@@ -59,7 +59,7 @@ class ChallengeHistoryController extends Controller
     {
         if ($challengeAttempt->challenger_1 == Auth::user()->id || $challengeAttempt->challenger_2 == Auth::user()->id) {
 
-            $records = $challengeAttempt->load("challengeRecords","challengeRecords.challenger",'challenge','ratings');
+            $records = $challengeAttempt->load("challengeRecords","challengeRecords.challenger",'challenge','ratings',"challenge.priceRecord");
 
 
             return makeResponse('success',__('response_message.record_found'),Response::HTTP_OK,$records);

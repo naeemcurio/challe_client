@@ -121,6 +121,7 @@
 
 {{--                                                @foreach($challengeAttempt->challengeResults as $challengeResult)--}}
 {{--                                                    @if($challengeResult->challenger_id == $challengeRecord->challenger_id )--}}
+                                            @if(!$challengeAttempt->winner_id)
                                                         <div class="text-center mb-4">
                                                             <a href="{{route('on-going-challenge-mark-winner',['on_going_challenge'=>$challengeAttempt->id,'challenger_id'=>$challengeRecord->challenger_id])}}"
                                                                class="primary-theme-btn">
@@ -128,6 +129,7 @@
                                                             </a>
 
                                                         </div>
+                                            @endif
 {{--                                                    @endif--}}
 {{--                                                @endforeach--}}
 {{--                                            @endif--}}

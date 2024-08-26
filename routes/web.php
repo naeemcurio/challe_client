@@ -99,6 +99,9 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
         Route::resource('users',UserController::class);
 
         Route::resource('challenge', ChallengeController::class);
+        Route::post('/challenge/{challenge}/remove-image', [ChallengeController::class, 'removeImage'])->name('challenge.removeImage');
+        Route::post('/challenge/{challenge}/remove-video', [ChallengeController::class, 'removeVideo'])->name('challenge.removeVideo');
+
 //        Route::post('save-video-chunks',[ChallengeController::class,'save_video_chunks'])->name('video.uploadChunk');
 
         Route::resource('on-going-challenge', OnGoingChallengeController::class)->only([

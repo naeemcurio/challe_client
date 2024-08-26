@@ -10,12 +10,15 @@ use App\Models\ChallengeRecordSubmission;
 use App\Models\ChallengeResult;
 use App\Models\Leaderboard;
 use App\Models\User;
+use App\Notifications\ChallengeResultNotification;
+use App\Notifications\PopularPackCreateNotification;
 use App\Traits\SendFirebaseNotificationTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class OnGoingChallengeController extends Controller
 {
@@ -194,6 +197,10 @@ class OnGoingChallengeController extends Controller
 
                 $this->announcement($loser->fcm_token, $title, $message, $notificationType, $data);
 
+                $type = 'challenge_loser';
+                Notification::send($loser,new ChallengeResultNotification($findChallengeAttempt->id,$title,$message,$type));
+
+
             }
 
         }
@@ -213,7 +220,13 @@ class OnGoingChallengeController extends Controller
 
 //            Log::info('winner');
 //            Log::info($findChallengeAttempt->winner->fcm_token);
+
+            $findWinner = User::find($findChallengeAttempt->winner);
             $this->announcement($findChallengeAttempt->winner->fcm_token, $title, $message, $notificationType, $data);
+
+            $type = "challenge_winner";
+            Notification::send($findWinner,new ChallengeResultNotification($findChallengeAttempt->id,$title,$message,$type));
+
         }
 
 

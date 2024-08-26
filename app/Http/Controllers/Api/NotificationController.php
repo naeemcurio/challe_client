@@ -34,6 +34,18 @@ class NotificationController extends Controller
                     'type'  => isset($notification->data['type']) ? $notification->data['type']:'',
                 ];
             }
+
+            elseif(isset($notification->data['type']) &&
+                ($notification->data['type'] == 'challenge_winner' || $notification->data['type'] == 'challenge_loser'))
+            {
+                $notificationArray[] = ['id'=>$notification->id,
+                    'title'=>__($notification->data['notification']),
+                    'message' => __($notification->data['message']),
+                    'type'  => isset($notification->data['type']) ? $notification->data['type']:'',
+                    'challenge_attempt_id' => isset($notification->data['attempt_id']) ? $notification->data['attempt_id']:''
+                ];
+            }
+
             else{
                 $notificationArray[] = ['id'=>$notification->id,
                     'title'=>__($notification->data['notification']),
