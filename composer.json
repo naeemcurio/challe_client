@@ -6,17 +6,18 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "elephantio/elephant.io": "^4.7",
         "guzzlehttp/guzzle": "^7.2",
         "hpwebdeveloper/laravel-pay-pocket": "^2.0",
         "intervention/image": "^3.4",
         "joedixon/laravel-translation": "^2.2",
+        "kreait/laravel-firebase": "^5.9",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "mcamara/laravel-localization": "^1.8",
         "stripe/stripe-php": "^7.28",
         "workerman/phpsocket.io": "^2.1",
-        "elephantio/elephant.io": "^4.7",
         "workerman/phpsocket.io-emitter": "^1.0"
     },
     "require-dev": {
