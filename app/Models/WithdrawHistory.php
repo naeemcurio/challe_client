@@ -16,8 +16,8 @@ class WithdrawHistory extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
-    public function cardDetail()
+    public function bankDetail()
     {
-        return $this->hasOne(WithdrawHistoryCard::class,'withdraw_history_id');
+        return $this->hasOne(WithdrawHistoryBank::class,'withdraw_history_id');
     }
 }

@@ -69,6 +69,16 @@ class SocketConfiguration extends Command
                     Log::info('done');
                 });
 
+                $socket->on('searchAgain',function($data)use($io){
+                    $channelName = $data['user_id'] . '-search-again';
+
+                    $io->emit($channelName, [
+                        'title' => $data['title'],
+                        'message' => $data['message'],
+                        'data' => $data['data']
+                    ]);
+                });
+
 //                $socket->on('wait-event', function ($data) use ($io) {
 //
 //                    if (!isset($data['waiting_lounge_id'])) {

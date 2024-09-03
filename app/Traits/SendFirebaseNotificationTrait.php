@@ -9,6 +9,25 @@ use Illuminate\Support\Facades\Log;
 trait SendFirebaseNotificationTrait
 {
 
+    public function sendInChallengeNotification($fcmToken,$getPayment)
+    {
+        $notificationType = 7;
+        $title = __('notification_message.someone_searching_title');
+        $message = __('notification_message.someone_searching').' '.$getPayment->price.'$ '.__('title.challenge');
+
+
+        $data = array();
+        $data['notification_type'] = $notificationType;
+        $data ['title'] = $title;
+        $data['body'] = $message;
+        $data['data'] = null;
+
+        $this->sendPushNotification('/topics/'.$fcmToken, $data);
+
+        return true;
+    }
+
+
     public function waitNotification($fcmToken, $title, $message, $notification_type,$dataBody = null)
     {
         $data = array();

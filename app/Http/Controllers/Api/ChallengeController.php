@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Models\UserPayment;
 use App\Models\WaitingLounge;
 use App\Services\Api\ChallengeService;
+use App\Traits\KreaitFirebaseLaravel;
 use App\Traits\SendFirebaseNotificationTrait;
 use App\Traits\SocketEventTrigger;
 use App\Traits\UserTrait;
@@ -36,7 +37,7 @@ use ElephantIO\Engine\SocketIO\Version2X;
 
 class ChallengeController extends Controller
 {
-    use SendFirebaseNotificationTrait, UserTrait, SocketEventTrigger;
+    use KreaitFirebaseLaravel, UserTrait, SocketEventTrigger;
 
     public $challengeService;
 
@@ -54,6 +55,7 @@ class ChallengeController extends Controller
 
     public function execute(Request $request)
     {
+
         DB::beginTransaction();
 
         $getPayment = UserPayment::where('user_id', Auth::user()->id)
@@ -128,6 +130,16 @@ class ChallengeController extends Controller
                 $timeLeft = $currentTime->diffInSeconds($expirationTime, false);
             }
 
+
+            //if one user connect and other cancel
+//            $checkForWaiting = WaitingLounge::where('id',$findInLounge->id)->first();
+//
+//            if(!$checkForWaiting)
+//            {
+//                DB::rollBack();
+//                return $this->challengeService->saveRecordInWaitingLounge($getPayment,$request);
+//
+//            }
 
             if ($readyLounge->user1) {
                 $userData = $this->fetchUserRecordForChallengeFromRelation($readyLounge->user2);
@@ -422,26 +434,60 @@ class ChallengeController extends Controller
             $waitingLoungeID = WaitingLounge::where('id', $request->waiting_lounge_id)
                 ->where('user_id', Auth::user()->id)->first();
 
+
             if (!$waitingLoungeID) {
                 return makeResponse('error', __('response_message.invalid_waiting_lounge_id'), Response::HTTP_FORBIDDEN);
             }
 
+            $loungeID = $waitingLoungeID->id;
+
 
             if ($waitingLoungeID->status == 1) {
-                $userData = $this->fetchUserRecordForChallengeFromRelation($waitingLoungeID->readyLounge->user2);
-                $data = [
-                    'ready_lounge_id' => $waitingLoungeID->readyLounge->id,
-                    'otherUserData' => $userData
-                ];
+                if(isset($waitingLoungeID->readyLounge->user2))
+                {
+                    $userData = $this->fetchUserRecordForChallengeFromRelation($waitingLoungeID->readyLounge->user2);
+                    $data = [
+                        'ready_lounge_id' => $waitingLoungeID->readyLounge->id,
+                        'otherUserData' => $userData
+                    ];
+
+                }
+                else{
+                    $data = [
+                        'ready_lounge_id' => isset($waitingLoungeID->readyLounge->id) ? $waitingLoungeID->readyLounge->id:null,
+                        'otherUserData' => null
+                    ];
+                }
 
                 return makeResponse('error', __('response_message.cancel_already_matched'), Response::HTTP_ALREADY_REPORTED, $data);
             }
 
             $price = Price::find($waitingLoungeID->price_id);
 
-            $waitingLoungeID->delete();
+            $checkInReadyLounge = ReadyLounge::where('waiting_lounge_id',$waitingLoungeID->id)->first();
 
-            Auth::user()->deposit('wallet_1', $price->price);
+            if($checkInReadyLounge)
+            {
+                $waitingLoungeID->update('user_id',$checkInReadyLounge->user_2);
+
+                $title = __('response_message.unexpected_reset_title');
+                $message = __('response_message.unexpected_reset_body');
+
+                $sendEvent = $this->eventEmitForSearch( $checkInReadyLounge->user_2,$title,$message,$waitingLoungeID);
+
+                $attempt = ChallengeAttempt::where('ready_lounge_id',$checkInReadyLounge->id)->delete();
+                $checkInReadyLounge->delete();
+
+            }
+            else{
+//                $waitingLoungeID->status = 2;
+//                $waitingLoungeID->save();
+
+                $waitingLoungeID->delete();
+            }
+
+
+            Auth::user()->deposit('wallet_1', $price->price,'Challenge Cancel');
 
             return makeResponse('success', __('response_message.challenge_cancel_success'), Response::HTTP_OK);
         } catch (\Exception $e) {

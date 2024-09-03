@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Models\Wallet;
 use App\Traits\UserTrait;
 use Carbon\Carbon;
+use HPWebdeveloper\LaravelPayPocket\Models\WalletsLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -107,7 +109,28 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('admin.user.edit',compact('user'));
+
+        $challenge_create_wallet = Wallet::where('owner_id',$user->id)->where('type','wallet_2')->first();
+
+        $getChallengeCreateWalletLogs = array();
+
+        if($challenge_create_wallet)
+        {
+            $getChallengeCreateWalletLogs = WalletsLog::where('loggable_id',$challenge_create_wallet->id)->get();
+
+        }
+
+        $challenge_attempt_wallet = Wallet::where('owner_id',$user->id)->where('type','wallet_1')->first();
+
+        $getChallengeAttemptWalletLogs = array();
+
+        if($challenge_attempt_wallet)
+        {
+            $getChallengeAttemptWalletLogs = WalletsLog::where('loggable_id',$challenge_attempt_wallet->id)->get();
+        }
+
+
+        return view('admin.user.edit',compact('user','getChallengeCreateWalletLogs','getChallengeAttemptWalletLogs'));
     }
 
     /**

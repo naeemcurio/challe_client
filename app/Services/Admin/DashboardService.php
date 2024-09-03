@@ -17,6 +17,7 @@ class DashboardService
         $challenges = Challenge::count();
         $stripeBalance = $payment->getBalance();
 
+
         if(isset($stripeBalance['data']))
         {
             $stripeBalance = $stripeBalance['data'];
@@ -24,7 +25,6 @@ class DashboardService
         else{
             $stripeBalance = 0;
         }
-
 
 
         return view('admin.dashboard.dashboard',compact('users','challenges','stripeBalance'));

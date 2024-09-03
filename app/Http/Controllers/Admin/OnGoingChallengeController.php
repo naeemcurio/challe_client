@@ -12,6 +12,7 @@ use App\Models\Leaderboard;
 use App\Models\User;
 use App\Notifications\ChallengeResultNotification;
 use App\Notifications\PopularPackCreateNotification;
+use App\Traits\KreaitFirebaseLaravel;
 use App\Traits\SendFirebaseNotificationTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Notification;
 class OnGoingChallengeController extends Controller
 {
 
-    use SendFirebaseNotificationTrait;
+    use KreaitFirebaseLaravel;
 
     public function index()
     {

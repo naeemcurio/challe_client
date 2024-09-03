@@ -25,13 +25,13 @@ trait UserTrait
             'stripe_customer_id' => $user->stripe_customer_id,
             'stripe_connect_account_id' => $user->stripe_connect_id,
 
-            'special_offers' => isset($user->userNotification) ? $user->userNotification->special_offers:0,
-            'sound' => isset($user->userNotification) ? $user->userNotification->sound:0,
-            'general_notification' => isset($user->userNotification) ? $user->userNotification->general_notification:0,
-            'payment_option' => isset($user->userNotification) ? $user->userNotification->payment_option:0,
-            'app_update' => isset($user->userNotification) ? $user->userNotification->app_update:0,
-            'new_service_available' =>isset($user->userNotification) ? $user->userNotification->new_service_available:0,
-            'new_tips_available' =>isset($user->userNotification) ? $user->userNotification->new_tips_available:0,
+            'special_offers' => isset($user->userNotification) ? $user->userNotification->special_offers : 0,
+            'sound' => isset($user->userNotification) ? $user->userNotification->sound : 0,
+            'general_notification' => isset($user->userNotification) ? $user->userNotification->general_notification : 0,
+            'payment_option' => isset($user->userNotification) ? $user->userNotification->payment_option : 0,
+            'app_update' => isset($user->userNotification) ? $user->userNotification->app_update : 0,
+            'new_service_available' => isset($user->userNotification) ? $user->userNotification->new_service_available : 0,
+            'new_tips_available' => isset($user->userNotification) ? $user->userNotification->new_tips_available : 0,
 
             'created_at' => $user->created_at
         ];
@@ -40,6 +40,7 @@ trait UserTrait
 
     public function fetchUserRecordForChallengeFromRelation($model)
     {
+
         $data = [
             'id' => $model->id,
             'image' => $model->image,
@@ -49,5 +50,7 @@ trait UserTrait
             'email' => $model->email,
         ];
         return $data;
+
+
     }
 }

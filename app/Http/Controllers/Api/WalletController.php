@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\WithdrawalRequest;
 use App\Models\User;
 use App\Models\WithdrawHistory;
+use App\Models\WithdrawHistoryBank;
 use App\Models\WithdrawHistoryCard;
 use App\Services\PaymentGateway\RapydService;
 use Carbon\Carbon;
@@ -170,12 +171,20 @@ class WalletController extends Controller
         if($withdraw->request_type == 1)
         {
             try{
-                $withdraw_request =  WithdrawHistoryCard::create([
-                   'withdraw_history_id' => $withdraw->id,
-                   'card_holder_name' => $request->card_holder_name,
-                   'card_number' => $request->card_number,
-                   'card_expiry_month' => $request->card_expiry_month,
-                   'card_expiry_year' => $request->card_expiry_year,
+//                $withdraw_request =  WithdrawHistoryCard::create([
+//                   'withdraw_history_id' => $withdraw->id,
+//                   'card_holder_name' => $request->card_holder_name,
+//                   'card_number' => $request->card_number,
+//                   'card_expiry_month' => $request->card_expiry_month,
+//                   'card_expiry_year' => $request->card_expiry_year,
+//                ]);
+
+
+                $withdraw_request =  WithdrawHistoryBank::create([
+                    'withdraw_history_id' => $withdraw->id,
+                    'bank_name' => $request->bank_name,
+                    'account_number' => $request->account_number,
+                    'additional_info' => $request->additional_info,
                 ]);
             }
             catch (\Exception $e)

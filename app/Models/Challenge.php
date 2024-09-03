@@ -76,7 +76,7 @@ class Challenge extends Model
         $winningPrice = $price - $companyCommission - $challengeCreatorCommission;
 
         return [
-            'winning_price' => number_format($winningPrice, 2),
+            'winning_price' => number_format($winningPrice, 2, '.', ''),
             'company_commission' => number_format($companyCommission, 5),
             'challenge_creator_Commission' => $challengeCreatorCommission,
         ];

@@ -46,4 +46,46 @@ trait SocketEventTrigger
         return $response;
     }
 
+
+    public function eventEmitForSearch($title, $message, $userID, $data )
+    {
+//        $url = "http://202.166.170.246:8081";
+        $url = "http://localhost:8081";
+
+
+        $options = [
+            'transport' => 'websocket',
+        ];
+
+        $client = Client::create($url,$options);
+
+//        $client = new Client(new Version2X('http://202.166.170.246:8081')); // Change the URL to your Soketi/Socket.IO server address
+
+        // emit an event to the server
+        try{
+            $client->connect();
+
+            $setData = [
+                'waiting_lounge_id' => $data
+            ];
+
+
+            $emitData = ['title' => $title, 'message' => $message,
+                'user_id' => $userID, 'data' => $setData];
+
+//            $client->emit('statusEvent', $emitData);
+            $client->emit('searchAgain', $emitData);
+
+        }
+        catch (\Exception $e)
+        {
+            $response = ['result'=>"error",'message'=>$e];
+            return $response;
+        }
+
+        $response = ['result'=>"success"];
+        return $response;
+    }
+
+
 }

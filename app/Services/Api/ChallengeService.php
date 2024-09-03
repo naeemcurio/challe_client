@@ -10,6 +10,7 @@ use App\Models\Price;
 use App\Models\ReadyLounge;
 use App\Models\User;
 use App\Models\WaitingLounge;
+use App\Traits\KreaitFirebaseLaravel;
 use App\Traits\SendFirebaseNotificationTrait;
 use App\Traits\SocketEventTrigger;
 use App\Traits\UserTrait;
@@ -22,15 +23,15 @@ use Illuminate\Support\Facades\Log;
 
 class ChallengeService
 {
-    use SendFirebaseNotificationTrait, UserTrait,SocketEventTrigger;
+    use KreaitFirebaseLaravel, UserTrait, SocketEventTrigger;
 
     public function getPopularPacksResponse($data)
     {
         $packArray = array();
         foreach ($data as $key => $price) {
 
-            $getTotalPlayerInSearch = WaitingLounge::where('price_id',$price->id)
-                ->where('status',0)->count();
+            $getTotalPlayerInSearch = WaitingLounge::where('price_id', $price->id)
+                ->where('status', 0)->count();
 
             $averageRating = 0;
             $totalChallengesOfPrice = Challenge::where('price_id', $price->id)
@@ -77,7 +78,7 @@ class ChallengeService
                 'avg_rating' => number_format($totalAverage, 1),
                 'win_amount' => isset($winningAmount) ? $winningAmount['winning_price'] : 0,
                 'challenge_count' => count($totalChallengesOfPrice),
-                'total_player_in_search'  => $getTotalPlayerInSearch
+                'total_player_in_search' => $getTotalPlayerInSearch
             ];
         }
         return $packArray;
@@ -86,6 +87,7 @@ class ChallengeService
     public function saveRecordInChallengeAttempt($challenge, $readyLoungeId)
     {
         $prices = Challenge::calculateWinningAmount($challenge);
+
 
         $challengeAttempt = ChallengeAttempt::create([
             'ready_lounge_id' => $readyLoungeId->id,
@@ -162,7 +164,7 @@ class ChallengeService
                     'price' => $readyLounge->waitingLounge->price,
                     'waiting_time' => $readyLounge->waiting_time,
                     'created_at' => $createdAt->format('Y-m-d H:i:s'),
-                    'time_left' => $timeLeft < 0 ? 0:$timeLeft
+                    'time_left' => $timeLeft < 0 ? 0 : $timeLeft
                 ];
 
             return $response;
@@ -176,12 +178,11 @@ class ChallengeService
         if ($attempt) {
             if (!isset($attempt['challenge_status'])) {
 
-                $attempt->load('challenge','readyLounge');
+                $attempt->load('challenge', 'readyLounge');
 
                 $timeLeft = 0;
                 $otherUserData = array();
-                if(isset($attempt->readyLounge))
-                {
+                if (isset($attempt->readyLounge)) {
 
                     if ($attempt->readyLounge->user_1 == Auth::user()->id) {
                         $otherUser = User::find($attempt->readyLounge->user_2);
@@ -246,8 +247,12 @@ class ChallengeService
 
     public function searchLounge()
     {
-        $data = WaitingLounge::where('status', 0)->where('user_id', Auth::user()->id)
-            ->orderBy('id','desc')
+        $data = WaitingLounge::where(function (Builder $query) {
+                $query->where('status', 0);
+//                    ->orwhere('status', 2);
+            })
+            ->where('user_id', Auth::user()->id)
+            ->orderBy('id', 'desc')
             ->first();
 
         return $data;
@@ -264,7 +269,7 @@ class ChallengeService
                 $query->where('user_2', Auth::user()->id)
                     ->where('user2_status', 0);
             })
-            ->orderBy('id','desc')
+            ->orderBy('id', 'desc')
             ->first();
 
 
@@ -278,17 +283,14 @@ class ChallengeService
                 ->orwhere('challenger_2', Auth::user()->id);
         })
             ->where('is_completed', 0)
-            ->orderBy('id','desc')
+            ->orderBy('id', 'desc')
             ->first();
-
 
 
         if ($data) {
 
-            if($data->readyLounge->user_1 == Auth::user()->id)
-            {
-                if($data->readyLounge->user1_status == 2)
-                {
+            if ($data->readyLounge->user_1 == Auth::user()->id) {
+                if ($data->readyLounge->user1_status == 2) {
                     $data['challenge_status'] = 'completed';
                 }
 
@@ -300,11 +302,9 @@ class ChallengeService
 
             }
 
-            if($data->readyLounge->user_2 == Auth::user()->id)
-            {
+            if ($data->readyLounge->user_2 == Auth::user()->id) {
 
-                if($data->readyLounge->user2_status == 2)
-                {
+                if ($data->readyLounge->user2_status == 2) {
                     $data['challenge_status'] = 'completed';
                 }
 
@@ -315,9 +315,7 @@ class ChallengeService
                 }
 
 
-
             }
-
 
 
         }
@@ -326,10 +324,10 @@ class ChallengeService
 
     }
 
-    public function saveRecordInWaitingLounge($getPayment,$request)
+    public function saveRecordInWaitingLounge($getPayment, $request)
     {
         DB::beginTransaction();
-        try{
+        try {
             $wait = WaitingLounge::create([
                 'latitude' => $request->lat,
                 'longitude' => $request->lng,
@@ -346,19 +344,20 @@ class ChallengeService
                 $this->waitNotification(Auth::user()->fcm_token, $title, $message, $notificationType);
             }
 
+
+            $this->sendInChallengeNotification('search_for_opponent', $getPayment->price);
+
+
             $sendEvent = $this->eventEmit($title, $message, Auth::user()->id, $notificationType);
 
-            if(isset($sendEvent['result']) && $sendEvent['result'] == 'error')
-            {
+            if (isset($sendEvent['result']) && $sendEvent['result'] == 'error') {
                 Log::info($sendEvent['message']);
             }
             DB::commit();
             return makeResponse('success', __('challenge_response.wait_body'), Response::HTTP_OK, ['waiting_lounge_id' => $wait->id]);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
-            return makeResponse('error', __('response_message.error_message_line').' '.('response_message.record'),
+            return makeResponse('error', __('response_message.error_message_line') . ' ' . __('response_message.record').': '.$e,
                 Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
