@@ -26,8 +26,8 @@ trait KreaitFirebaseLaravel
     {
 
         $notificationType = 7;
-        $title = __('notification_message.someone_searching_title');
-        $message = __('notification_message.someone_searching').' '.$getPayment->price.'$ '.__('title.challenge');
+        $title = __('notification_message.someone_searching_title', [], 'en');
+        $message = __('notification_message.someone_searching', [], 'en').' '.$getPayment->price.'$ '.__('title.challenge', [], 'en');
 
         $notification = Notification::create($title, $message);
         $data = [

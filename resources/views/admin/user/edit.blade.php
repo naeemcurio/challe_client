@@ -14,6 +14,9 @@
             background: #007fff !important;
         }
     </style>
+
+    <link rel="stylesheet" href="{{asset('admin/css/dataTables.bootstrap5.css')}}">
+
 @endsection
 
 
@@ -96,7 +99,8 @@
                                     <label class="form-label">{{__('users.gender')}}</label>
                                     <select name="gender" class="form-control">
                                         <option value="" selected disabled>{{ucfirst(__('options.select'))}}</option>
-                                        <option value="male" {{$user->gender == 'male' ? 'selected':''}}>{{ucfirst(__('options.male'))}}</option>
+                                        <option
+                                            value="male" {{$user->gender == 'male' ? 'selected':''}}>{{ucfirst(__('options.male'))}}</option>
                                         <option
                                             value="female" {{$user->gender == 'female' ? 'selected':''}}>{{ucfirst(__('options.female'))}}</option>
                                     </select>
@@ -137,6 +141,111 @@
 
                     </form>
                 </div>
+
+
+                @if(sizeof($getChallengeCreateWalletLogs) >0)
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6 class="card-title mb-4">{{__('title.user').' '.__('title.wallet_history')}}</h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="dataTableExample" class="table">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{__('users.wallet_type')}}</th>
+                                    <th>{{__('users.value')}} </th>
+                                    <th>{{__('users.transaction_type')}}</th>
+                                    <th>{{__('users.notes')}}</th>
+                                    <th>{{__('users.from')}}</th>
+                                    <th>{{__('users.to')}}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                @foreach($getChallengeCreateWalletLogs as $walletLog)
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>
+                                            @if($walletLog->wallet_name == 'wallet_1')
+                                                {{__('wallet_type.wallet_1')}}
+                                            @elseif($walletLog->wallet_name == 'wallet_2')
+                                                {{__('wallet_type.wallet_2')}}
+                                            @elseif($walletLog->wallet_name == 'wallet_3')
+                                                {{__('wallet_type.wallet_3')}}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+
+
+                                        <td>{{$walletLog->value }} </td>
+                                        <td>{{$walletLog->type}}</td>
+                                        <td>{{$walletLog->notes}}</td>
+                                        <td>{{$walletLog->from }}</td>
+                                        <td>{{$walletLog->to }}</td>
+                                    </tr>
+                                @endforeach
+
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                @endif
+
+                @if(sizeof($getChallengeAttemptWalletLogs) >0)
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6 class="card-title mb-4">{{__('title.user').' '.__('title.wallet_history')}}</h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="dataTableExample" class="table">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{__('users.wallet_type')}}</th>
+                                    <th>{{__('users.value')}} </th>
+                                    <th>{{__('users.transaction_type')}}</th>
+                                    <th>{{__('users.notes')}}</th>
+                                    <th>{{__('users.from')}}</th>
+                                    <th>{{__('users.to')}}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                @foreach($getChallengeAttemptWalletLogs as $walletLog)
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>
+                                            @if($walletLog->wallet_name == 'wallet_1')
+                                                {{__('wallet_type.wallet_1')}}
+                                            @elseif($walletLog->wallet_name == 'wallet_2')
+                                                {{__('wallet_type.wallet_2')}}
+                                            @elseif($walletLog->wallet_name == 'wallet_3')
+                                                {{__('wallet_type.wallet_3')}}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+
+
+                                        <td>{{$walletLog->value}} </td>
+                                        <td>{{$walletLog->type}}</td>
+                                        <td>{{$walletLog->notes}}</td>
+                                        <td>{{$walletLog->from }}</td>
+                                        <td>{{$walletLog->to }}</td>
+                                    </tr>
+                                @endforeach
+
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -145,6 +254,8 @@
 
 
 @section('script')
+
+    @include('layout.admin.datatable_js')
 
     <script src="{{asset('admin/js/dropify.min.js')}}"></script>
 
@@ -192,8 +303,7 @@
                         if (data.status == 422) {
                             $.unblockUI();
                             errorMsg(xhr.responseJSON.message);
-                        }
-                        else {
+                        } else {
                             $.unblockUI();
                             errorMsg(xhr.responseJSON.message);
                         }

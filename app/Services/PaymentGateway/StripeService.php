@@ -283,7 +283,7 @@ class StripeService
         }
     }
 
-    public function charge($amount,$token = null)
+    public function charge($amount, $token = null)
     {
         try {
 
@@ -299,7 +299,6 @@ class StripeService
                 'currency' => 'usd',
                 'description' => 'Customer Charge For Challenge Attempt Price',
                 "source" => $token,
-
 //                'customer' => $customerID,
             ]);
 
@@ -335,7 +334,7 @@ class StripeService
             $accountLink = $this->stripe->accountLinks->create([
                 'account' => $accountID,
                 'refresh_url' => route('refreshAccountLink', ['accountID' => $accountID]),
-                'return_url' => route('adminLogin').'?status=200',
+                'return_url' => route('adminLogin') . '?status=200',
                 'type' => 'account_onboarding',
             ]);
 
@@ -361,11 +360,9 @@ class StripeService
     public function createConnectAccount($request)
     {
 
-        if($request->email)
-        {
+        if ($request->email) {
             $email = $request->email;
-        }
-        else{
+        } else {
             $email = Auth::user()->email;
         }
 
@@ -403,7 +400,7 @@ class StripeService
 
 
             foreach ($balance->available as $available) {
-                $availableAmount = $available->amount/100;
+                $availableAmount = $available->amount / 100;
             }
 
             return ['type' => 'success', 'data' => $availableAmount];

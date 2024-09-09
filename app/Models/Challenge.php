@@ -40,6 +40,11 @@ class Challenge extends Model
         return $this->belongsTo(User::class,'created_by');
     }
 
+    public function price(): BelongsTo
+    {
+        return $this->belongsTo(Price::class,'price_id');
+    }
+
     public function challengeAttempt()
     {
         return $this->hasMany(ChallengeAttempt::class,'challenge_id');

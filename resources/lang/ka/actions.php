@@ -13,5 +13,6 @@ return array (
   'successfully' => 'Წარმატებით',
   'update' => 'განახლება',
   'view' => 'ხედი',
+  'view_account_detail' => 'ანგარიშის დეტალების ნახვა',
   'view_card_detail' => 'ბარათის დეტალების ნახვა',
 );

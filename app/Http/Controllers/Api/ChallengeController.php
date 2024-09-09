@@ -56,6 +56,7 @@ class ChallengeController extends Controller
     public function execute(Request $request)
     {
 
+//        Log::info('in execute');
         DB::beginTransaction();
 
         $getPayment = UserPayment::where('user_id', Auth::user()->id)
@@ -76,6 +77,8 @@ class ChallengeController extends Controller
             ->lockForUpdate()
             ->first();
 
+
+
         if (!$findInLounge) {
             DB::commit();
             //match according to price and save record in waiting lounge
@@ -86,6 +89,7 @@ class ChallengeController extends Controller
         $findInLounge->save();
 
 
+//        Log::info('waiting lounge status: '.$findInLounge->status);
 
 //        DB::beginTransaction();
 
@@ -106,9 +110,14 @@ class ChallengeController extends Controller
                 'waiting_time' => $waitingTime
             ]);
 
+            DB::commit();
+//            Log::info('commit call on 114');
 
-            $title = __('challenge_response.matched');
-            $message = __('challenge_response.matched_body');
+//            Log::info('ready record create: '.$readyLounge->id);
+
+
+            $title = __('challenge_response.matched',[],'en');
+            $message = __('challenge_response.matched_body',[],'en');
             $notificationType = 1;
 
             $createdAt = Carbon::parse($readyLounge->created_at);
@@ -203,11 +212,13 @@ class ChallengeController extends Controller
         }
         else{
             DB::commit();
+//            Log::info('commit for 213');
             //match according to price and save record in waiting lounge
             return $this->challengeService->saveRecordInWaitingLounge($getPayment,$request);
         }
 
-        DB::commit();
+//        Log::info('commit for 219');
+
         return makeResponse('success', __('challenge_response.matched_body'), Response::HTTP_OK, $data);
     }
 
@@ -246,8 +257,8 @@ class ChallengeController extends Controller
 
 
             if ($notificationStatus == 1) {
-                $title = Auth::user()->full_name . ' ' . __('challenge_response.is_ready');
-                $message = Auth::user()->full_name . ' ' . __('challenge_response.is_ready_body');
+                $title = Auth::user()->full_name . ' ' . __('challenge_response.is_ready',[],'en');
+                $message = Auth::user()->full_name . ' ' . __('challenge_response.is_ready_body',[],'en');
                 $notificationType = 2;
 
                 if ($findUser->fcm_token) {
@@ -367,8 +378,8 @@ class ChallengeController extends Controller
 
             if ($status == 'in_challenge') {
 
-                $title = __('challenge_response.record_submit_title');
-                $message = Auth::user()->full_name . ' ' . __('challenge_response.record_submit_body');
+                $title = __('challenge_response.record_submit_title',[],'en');
+                $message = Auth::user()->full_name . ' ' . __('challenge_response.record_submit_body',[],'en');
                 $notificationType = 4;
                 if ($user->fcm_token) {
 
@@ -430,9 +441,16 @@ class ChallengeController extends Controller
 
     public function cancelChallenge(CancelChallengeRequest $request)
     {
+
+
+//        DB::beginTransaction();
+//        Log::info('in cancel function');
+
         try {
             $waitingLoungeID = WaitingLounge::where('id', $request->waiting_lounge_id)
                 ->where('user_id', Auth::user()->id)->first();
+
+//            Log::info('waiting lounge id: '.$waitingLoungeID->id);
 
 
             if (!$waitingLoungeID) {
@@ -466,8 +484,12 @@ class ChallengeController extends Controller
 
             $checkInReadyLounge = ReadyLounge::where('waiting_lounge_id',$waitingLoungeID->id)->first();
 
+//            Log::info('check for ready lounge: '.$checkInReadyLounge);
+
+
             if($checkInReadyLounge)
             {
+//                Log::info('in jugar');
                 $waitingLoungeID->update('user_id',$checkInReadyLounge->user_2);
 
                 $title = __('response_message.unexpected_reset_title');
@@ -480,17 +502,19 @@ class ChallengeController extends Controller
 
             }
             else{
+//                Log::info('in wait delete');
 //                $waitingLoungeID->status = 2;
 //                $waitingLoungeID->save();
 
                 $waitingLoungeID->delete();
             }
 
-
             Auth::user()->deposit('wallet_1', $price->price,'Challenge Cancel');
-
+//            DB::commit();
+//            Log::info('delete done');
             return makeResponse('success', __('response_message.challenge_cancel_success'), Response::HTTP_OK);
         } catch (\Exception $e) {
+//            DB::rollBack();
             return makeResponse('error', __('challenge.cancel_error') . ' : ' . $e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

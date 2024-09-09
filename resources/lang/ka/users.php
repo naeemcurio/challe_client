@@ -13,6 +13,7 @@ return array (
   'new_service_available' => 'ახალი სერვისი ხელმისაწვდომია',
   'new_tips_available' => 'ახალი რჩევები ხელმისაწვდომია',
   'nick_name' => 'ნიკ სახელი',
+  'notes' => 'შენიშვნები',
   'notification' => 'შეტყობინება',
   'password' => 'პაროლი',
   'phone_number' => 'Ტელეფონის ნომერი',
@@ -22,5 +23,9 @@ return array (
   'provider_id' => 'პროვაიდერის ID',
   'sound' => 'ხმა',
   'special_offer' => 'Სპეციალური შეთავაზება',
+  'to' => 'რომ',
+  'transaction_type' => 'გარიგების ტიპი',
+  'value' => 'ღირებულება',
   'wallet_amount' => 'საფულის თანხა',
+  'wallet_type' => 'საფულის ტიპი',
 );

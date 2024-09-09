@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DataTables\ChallengeListing;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChallengeStoreRequest;
 use App\Http\Requests\Admin\ChallengeUpdateRequest;
@@ -38,11 +39,19 @@ class ChallengeController extends Controller
 
     }
 
-    public function index(Request $request)
-    {
-        $challenges = Challenge::all();
+//    public function index(Request $request)
+//    {
+//        $challenges = Challenge::all();
+//
+//        return view('admin.challenge.listing', compact('challenges'));
+//    }
 
-        return view('admin.challenge.listing', compact('challenges'));
+
+    public function index(ChallengeListing $dataTable)
+    {
+
+        return $dataTable->render('admin.challenge.listing');
+
     }
 
     public function create(Request $request)

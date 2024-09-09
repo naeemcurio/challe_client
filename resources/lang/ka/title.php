@@ -27,5 +27,6 @@ return array (
   'type' => 'ტიპი',
   'user' => 'მომხმარებელი',
   'user_listing' => 'მომხმარებელთა სია',
+  'wallet_history' => 'საფულის ისტორია',
   'withdraw' => 'გაყვანა',
 );

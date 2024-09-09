@@ -180,8 +180,8 @@ class OnGoingChallengeController extends Controller
             if($forfeit == 1)
             {
                 $notificationType = 5;
-                $title = __('challenge_response.sorry_title');
-                $message = __('challenge_response.sorry_body');
+                $title = __('challenge_response.sorry_title',[],'en');
+                $message = __('challenge_response.sorry_body',[],'en');
 
                 $findChallengeAttempt->makeHidden('winner','readyLounge','challenge');
 
@@ -208,8 +208,8 @@ class OnGoingChallengeController extends Controller
 
         if (isset($findChallengeAttempt->winner) && $findChallengeAttempt->winner->fcm_token) {
             $notificationType = 6;
-            $title = __('challenge_response.congratulation_title');
-            $message = __('challenge_response.congratulation_body') . ' ' . $findChallengeAttempt->winning_amount;
+            $title = __('challenge_response.congratulation_title',[],'en');
+            $message = __('challenge_response.congratulation_body',[],'en') . ' ' . $findChallengeAttempt->winning_amount;
 
             $findChallengeAttempt->makeHidden('winner','readyLounge','challenge');
 

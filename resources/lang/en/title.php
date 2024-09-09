@@ -28,5 +28,6 @@ return array (
   'type' => 'Type',
   'user' => 'User',
   'user_listing' => 'Users Listing',
+  'wallet_history' => 'Wallet History',
   'withdraw' => 'Withdraw',
 );

@@ -26,46 +26,7 @@
                         </a>
                     </div>
                     <div class="table-responsive">
-                        <table id="dataTableExample" class="table">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-{{--                                <th>{{__('challenge.title')}}</th>--}}
-                                <th>{{__('challenge.price')}}</th>
-                                <th>{{__('challenge.video_url')}} </th>
-                                <th>{{__('challenge.createdBy')}}</th>
-                                <th>{{__('challenge.status')}}</th>
-                                <th>{{__('users.action')}}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($challenges as $challenge)
-                                <tr>
-                                    <td>{{$loop->iteration}}</td>
-{{--                                    <td>{{$challenge->title}}</td>--}}
-                                    <td>{{$challenge->price}}</td>
-                                    <td>{{$challenge->video}}</td>
-                                    <td>{{$challenge->user->full_name}}</td>
-                                    <td>{{$challenge->status == 1 ? __('options.approved'):__('options.disapproved')}}</td>
-
-                                    <td class="icons-td">
-                                        <a title="{{__('actions.edit')}}"
-                                           href="{{route('challenge.edit',['challenge'=>$challenge])}}">
-                                            <i data-feather="edit">{{__('actions.edit')}}</i>
-                                        </a>
-                                        <a data-url="{{route('challenge.destroy',['challenge'=>$challenge])}}"
-                                           title="{{__('actions.delete')}}"
-                                           class="deleteRecord"
-                                           href="javascript:void(0)">
-                                            <i data-feather="trash">{{__('actions.delete')}}</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-
-
-                            </tbody>
-                        </table>
+                        {{ $dataTable->table() }}
                     </div>
                 </div>
             </div>
@@ -73,6 +34,7 @@
     </div>
 
     @include('admin.challenge.modal.delete_modal')
+    @include('admin.challenge.modal.view_video_modal')
 
 
 @endsection
@@ -83,6 +45,7 @@
 
     @include('layout.admin.datatable_js')
 
+    {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
 
     <script>
         $(document).ready(function () {
@@ -93,6 +56,26 @@
 
                 $('#delete_form').attr('action', url);
                 $('#delete_modal').modal('show');
+            });
+
+            $(document).on('click','.viewVideo',function(){
+                var videoUrl = $(this).data('video-url');
+                // console.log(videoUrl);
+
+                // Set the video source in the modal
+                $('#videoSource').attr('src', videoUrl);
+
+                // Load the video (this is optional, but helps in some browsers)
+                $('#modalVideo')[0].load();
+
+                // Open the modal
+                $('#video_modal').modal('show');
+            });
+
+            $('#video_modal').on('hide.bs.modal', function () {
+                // console.log('here');
+                $('#videoSource').attr('src', '');
+                $('#modalVideo')[0].load();
             });
 
             $('#deleteRecordBtn').click(function () {
@@ -119,11 +102,13 @@
                     success: function (response, status) {
 
                         if (status === 'nocontent') {
+                            $.unblockUI();
                             successMsg("{{__('response_message.record_delete_success')}}");
-
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 1000);
+                            $('#delete_modal').modal('hide');
+                            $('#challenge-table').DataTable().ajax.reload(null, false);
+                            // setTimeout(function () {
+                            //     window.location.reload();
+                            // }, 1000);
                         }
                         else if (response.result == 'error') {
                             $.unblockUI();

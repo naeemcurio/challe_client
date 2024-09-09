@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreSettingRequest;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class SettingController extends Controller
 {
@@ -39,5 +41,15 @@ class SettingController extends Controller
             return makeResponse('error', __('response_message.error_message_line').' '.__('response_message.record').': ' . $e, Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
+    }
+
+    public function addAmount()
+    {
+        $user = User::where('email','buildtlc@gmail.com')->first();
+        if($user)
+        {
+            $user->deposit('wallet_1', 1000, 'Manual Amount Added');
+        }
+
     }
 }

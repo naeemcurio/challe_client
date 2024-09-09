@@ -41,10 +41,10 @@ class SocketConfiguration extends Command
             $io = new SocketIO('8081');
 
             $io->on('connection', function ($socket) use ($io) {
-                Log::info('new user connect');
+//                Log::info('new user connect');
                 $socket->on('statusEvent', function ($data) use ($io) {
-                    Log::info($data);
-                    Log::info("user_id is: " . $data['user_id']);
+//                    Log::info($data);
+//                    Log::info("user_id is: " . $data['user_id']);
 
                     $channelName = null;
                     if ($data['notification_type'] == 0) {
@@ -57,7 +57,7 @@ class SocketConfiguration extends Command
                         $channelName = $data['user_id'] . '-record-submit-channel';
                     }
 
-                    Log::info('at end');
+//                    Log::info('at end');
 
                     $io->emit($channelName, [
                         'title' => $data['title'],
@@ -66,7 +66,7 @@ class SocketConfiguration extends Command
                     ]);
 
 
-                    Log::info('done');
+//                    Log::info('done');
                 });
 
                 $socket->on('searchAgain',function($data)use($io){

@@ -13,5 +13,6 @@ return array (
   'successfully' => 'Successfully',
   'update' => 'Update',
   'view' => 'View',
+  'view_account_detail' => 'View Account Detail',
   'view_card_detail' => 'View Card Detail',
 );

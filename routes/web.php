@@ -127,6 +127,8 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
         Route::get('withdraw-transfer-amount/{withdraw}', [WithdrawController::class,'transfer'])
             ->name('withdraw.transferAmount');
 
+        Route::get('add-wallet-amount',[SettingController::class,'addAmount']);
+
 
     });
 });

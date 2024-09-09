@@ -336,22 +336,26 @@ class ChallengeService
                 'price_id' => $getPayment->price_id
             ]);
 
-            $title = __('challenge_response.wait');
-            $message = __('challenge_response.wait_body');
+            $title = __('challenge_response.wait',[],'en');
+            $message = __('challenge_response.wait_body',[],'en');
             $notificationType = 0;
 
             if (Auth::user()->fcm_token) {
                 $this->waitNotification(Auth::user()->fcm_token, $title, $message, $notificationType);
             }
 
+            if(env('APP_ENV') == 'prod')
+            {
+                $this->sendInChallengeNotification('search_for_opponent', $getPayment->price);
 
-            $this->sendInChallengeNotification('search_for_opponent', $getPayment->price);
+            }
+
 
 
             $sendEvent = $this->eventEmit($title, $message, Auth::user()->id, $notificationType);
 
             if (isset($sendEvent['result']) && $sendEvent['result'] == 'error') {
-                Log::info($sendEvent['message']);
+                Log::emergency($sendEvent['message']);
             }
             DB::commit();
             return makeResponse('success', __('challenge_response.wait_body'), Response::HTTP_OK, ['waiting_lounge_id' => $wait->id]);

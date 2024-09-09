@@ -67,7 +67,7 @@
                                             </a>
 
                                             @if($withdrawRequest->request_type == 1)
-                                                <a data-record = "{{$withdrawRequest->cardDetail}}" href="javascript:void(0)" class="showCardDetail">
+                                                <a data-record = "{{$withdrawRequest->bankDetail}}" href="javascript:void(0)" class="showCardDetail">
                                                     <i data-feather="eye">{{__('actions.view_card_detail')}}</i>
                                                 </a>
                                             @endif
@@ -106,11 +106,14 @@
 
             $(document).on('click', '.showCardDetail', function () {
                 var record = $(this).data('record');
+                var bank_name = "{{__('withdraw.bank_name')}}";
+                var account_number = "{{__('withdraw.account_number')}}";
+                var additional_info = "{{__('withdraw.additional_info')}}";
 
-                var html = '<h3><strong>Cardholder Name: </strong> '+ record.card_holder_name +'  </h3>';
-                 html += '<h3><strong>Card Number: </strong> '+ cc_format(record.card_number) +'  </h3>';
-                 html += '<h3><strong>Cardholder Expiry Month: </strong> '+ record.card_expiry_month +'  </h3>';
-                 html += '<h3><strong>Cardholder Expiry Year: </strong> '+ record.card_expiry_year +'  </h3>';
+                var html = '<h3><strong>'+bank_name+': </strong> '+ record.bank_name +'  </h3>';
+                 html += '<h3><strong>'+account_number+': </strong> '+ record.account_number +'  </h3>';
+                 html += '<h3><strong>'+additional_info+': </strong> '+ record.additional_info +'  </h3>';
+                 // html += '<h3><strong>Cardholder Expiry Year: </strong> '+ record.card_expiry_year +'  </h3>';
 
                  $('.modal-body').html(html);
                 $('#card_detail_modal').modal('show');

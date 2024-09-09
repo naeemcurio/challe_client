@@ -75,6 +75,8 @@ return array (
   'token_expire' => 'Your token has been expired. Please request again',
   'transfer_error' => 'Error in Transfer Amount To Connected Account',
   'transfer_success' => 'Amount Successfully Transferred to User Account',
+  'unexpected_reset_body' => 'Unexpectedly the user disconnected',
+  'unexpected_reset_title' => 'Unexpectedly the user disconnected',
   'unique_email' => 'Email must be unique',
   'unique_phone_number' => 'Phone Number must be Unique',
   'update_fcm_key' => 'Firebase Token Updated Successfully',

@@ -61,7 +61,6 @@
                 </a>
             </li>
 
-
             <li class="nav-item {{Str::is('withdraw.*',Request()->route()->getName() ) ? 'active':''}}">
                 <a href="{{route('withdraw.index')}}" class="nav-link">
                     <img src="{{asset('admin/img/pricel.svg')}}" class="img-fluid side-bar-icons" alt="" style="width: 24px; height: 24px;">
