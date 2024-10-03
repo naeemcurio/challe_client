@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ChatController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -117,9 +118,23 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
 
         Route::get('setting',[HomeController::class,'setting'])->name('setting');
 
+
+
+        Route::post('update-challenge-record',[Challenge::class,'updateRecord']);
+        Route::post('/validate-user', [AuthenticationController::class, 'validateUser']);
+
+        Route::post('lsp-payment',[PaymentController::class,'lspPayment']);
+
     });
 });
 
 //web-hook
 Route::post('card-status',[CardController::class,'changeCardStatus']);
 
+
+Route::post('get-conversation-list',[ChatController::class,'getConversationList']);
+Route::post('get-chat-history',[ChatController::class,'getHistory']);
+Route::post('send-message',[ChatController::class,'sendMessage']);
+
+
+Route::post('lsp-webhook',[PaymentController::class,'webhook_response']);

@@ -38,7 +38,7 @@ class SubmitRecordRequest extends FormRequest
         return [
             'video_url' => __('challenge.video_url'),
             'comments' => __('challenge.comment'),
-            'challenge_attempt_id' => __('users.nick_name'),
+            'challenge_attempt_id' => __('challenge.challenge_attempt_id'),
         ];
     }
 
@@ -46,7 +46,7 @@ class SubmitRecordRequest extends FormRequest
     public function messages()
     {
         return [
-            'video_url.required' => __('validation.email'),
+            'video_url.required' => __('validation.required'),
 //            'comments.required' => __('validation.required'),
             'challenge_attempt_id.required' => __('validation.required'),
         ];

@@ -42,21 +42,29 @@
                                     <div
                                         class="card {{$challengeAttempt->winner_id == $challengeRecord->challenger_id ? "winner":''}}">
                                         <div class="card-body">
-                                            <h5 class="card-title">{{$challengeRecord->challenger->full_name}}
-                                                @if($challengeRecord->submit_record_time)
-                                                    <span class="badge bg-success">
-                                                        {{\Carbon\Carbon::parse($challengeRecord->submit_record_time)->format('Y-m-d g:i:s.u A')}}
-                                                    </span>
-                                                @endif
-                                            </h5>
+                                            <a href="{{route('users.edit',['user'=>$challengeRecord->challenger])}}">
+                                                <h5 class="card-title">{{$challengeRecord->challenger->full_name}}
+                                                    @if($challengeRecord->submit_record_time)
+                                                        <span class="badge bg-success">
+                                                            {{\Carbon\Carbon::parse($challengeRecord->submit_record_time)->format('Y-m-d g:i:s.u A')}}
+                                                        </span>
+                                                    @endif
+                                                </h5>
+                                            </a>
 {{--                                            @if($challengeAttempt->winner_id == $challengeRecord->challenger_id)--}}
 {{--                                                <span>( {{strtoupper(__('on_going_challenge.winner'))}} )</span>--}}
 {{--                                            @endif--}}
-                                            <p class="card-text mb-3">
-                                                <a href="{{$challengeRecord->video_url}}" target="_blank">
-                                                    {{$challengeRecord->video_url}}
-                                                </a>
-                                            </p>
+                                            @foreach($challengeRecord->challengeURL as $challengeURLRecord)
+                                                <p class="card-text mb-3">
+                                                    <a href="{{$challengeURLRecord->video_url}}" target="_blank">
+                                                        {{$challengeURLRecord->video_url}}
+                                                    </a>
+
+                                                    <span class="badge bg-success">
+                                                        {{\Carbon\Carbon::parse($challengeURLRecord->created_at)->format('Y-m-d g:i:s.u A')}}
+                                                    </span>
+                                                </p>
+                                            @endforeach
                                             @if($challengeRecord->comments)
                                                 <p class="card-text comment-wrapper mb-3">
                                                     {{$challengeRecord->comments}}
@@ -158,8 +166,9 @@
                                 <div class="col-12 col-md-6 col-xl-6">
                                     <div class="card" style="border: var(--bs-card-border-width) solid red;">
                                         <div class="card-body">
-                                            <h5 class="card-title">{{$challengeUser->full_name}}</h5>
-
+                                            <a href="{{route('users.edit',['user'=>$challengeUser])}}">
+                                                <h5 class="card-title">{{$challengeUser->full_name}}</h5>
+                                            </a>
                                             <p class="card-text  text-center">
                                                 <img style="height: 263px" src="{{asset('admin/img/i-cant.avif')}}">
                                             </p>
@@ -186,7 +195,9 @@
                                 <div class="col-12 col-md-6 col-xl-6">
                                     <div class="card" style="border: var(--bs-card-border-width) solid red;">
                                         <div class="card-body">
-                                            <h5 class="card-title">{{$challengeUser->full_name}}</h5>
+                                            <a href="{{route('users.edit',['user'=>$challengeUser])}}">
+                                                <h5 class="card-title">{{$challengeUser->full_name}}</h5>
+                                            </a>
 
                                             <p class="card-text  text-center">
                                                 <img style="height: 263px" src="{{asset('admin/img/i-cant.avif')}}">

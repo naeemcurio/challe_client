@@ -24,6 +24,7 @@ return array (
   'provider_id' => 'Provider ID',
   'sound' => 'Sound',
   'special_offer' => 'Special Offer',
+  'timezone' => 'Timezone',
   'to' => 'To',
   'transaction_type' => 'Transaction Type',
   'value' => 'Value',

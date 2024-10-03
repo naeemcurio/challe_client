@@ -1,9 +1,15 @@
 <?php
 
 return array (
+  'address' => 'მისამართი',
   'card_id' => 'ბარათის ID',
   'challenge' => 'გამოწვევა',
+  'challenge_record_submit' => 'გამოწვევის ჩანაწერის გაგზავნა',
+  'chat' => 'ჩატი',
+  'city' => 'ქალაქი',
+  'coin_type' => 'მონეტის ტიპი',
   'completed' => 'დასრულებული',
+  'crypto' => 'CRYPTO',
   'date' => 'თარიღი',
   'delete_record' => 'ჩანაწერის წაშლა',
   'delete_verification' => 'დარწმუნებული ხართ, რომ გსურთ ამ ჩანაწერის წაშლა',
@@ -14,6 +20,7 @@ return array (
   'listing' => 'ჩამონათვალი',
   'lng' => 'გრძედი',
   'my_earning' => 'ჩემი შემოსავალი',
+  'network' => 'ქსელი',
   'on_going_challenge' => 'მიმდინარე გამოწვევაზე',
   'payment_id' => 'გადახდის ID',
   'pending' => 'მომლოდინე',
@@ -23,10 +30,13 @@ return array (
   'requestBy' => 'მოთხოვნა By',
   'request_type' => 'მოთხოვნის ტიპი',
   'setting' => 'დაყენება',
+  'start' => 'დაწყება',
   'stripe_balance' => 'ზოლის ბალანსი',
+  'today' => 'დღეს',
   'type' => 'ტიპი',
   'user' => 'მომხმარებელი',
   'user_listing' => 'მომხმარებელთა სია',
   'wallet_history' => 'საფულის ისტორია',
   'withdraw' => 'გაყვანა',
+  'withdraw_request' => 'ამოღების მოთხოვნა',
 );

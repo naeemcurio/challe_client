@@ -27,7 +27,10 @@ class UpdateLanguageRequest extends FormRequest
     public function rules()
     {
         return [
-            'default_language' => 'required|in:en,ka'
+            'default_language' => 'required|in:en,ka',
+            'timezone' => 'nullable'
+
+
         ];
     }
 
@@ -35,6 +38,8 @@ class UpdateLanguageRequest extends FormRequest
     {
         return [
             'default_language' => __('users.default_language'),
+            'timezone' => __('users.timezone'),
+
         ];
     }
 

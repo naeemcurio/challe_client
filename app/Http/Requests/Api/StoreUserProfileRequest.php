@@ -34,6 +34,7 @@ class StoreUserProfileRequest extends FormRequest
             'date_of_birth' => 'nullable|date|date_format:Y/m/d',
             'gender' => 'required',
             'phone_number' => 'nullable|unique:users,phone_number,'.Auth::user()->id,
+            'timezone' => 'nullable'
         ];
     }
 
@@ -47,6 +48,7 @@ class StoreUserProfileRequest extends FormRequest
             'gender' => __('users.gender'),
             'date_of_birth' => __('users.date_of_birth'),
             'image' => __('users.profile_image'),
+            'timezone' => __('users.timezone'),
 
         ];
     }

@@ -14,6 +14,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return true;
     }
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,12 +24,14 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'full_name' => 'required',
-            'nick_name'  => 'required',
-            'email' => 'required|email|unique:users,email,'.Auth::user()->id,
-            'phone_number' => 'required|unique:users,phone_number,'.Auth::user()->id,
+            'nick_name' => 'required',
+            'email' => 'required|email|unique:users,email,' . Auth::user()->id,
+            'phone_number' => 'required|unique:users,phone_number,' . Auth::user()->id,
             'gender' => 'required',
             'date_of_birth' => 'nullable|date|date_format:Y/m/d',
-            'image' => 'nullable|mimes:jpeg,jpg,png'
+            'image' => 'nullable|mimes:jpeg,jpg,png',
+            'timezone' => 'nullable'
+
         ];
     }
 
@@ -43,6 +46,7 @@ class UpdateProfileRequest extends FormRequest
             'gender' => __('users.gender'),
             'date_of_birth' => __('users.date_of_birth'),
             'image' => __('users.profile_image'),
+            'timezone' => __('users.timezone'),
 
         ];
     }
@@ -60,7 +64,7 @@ class UpdateProfileRequest extends FormRequest
             'gender.required' => __('validation.required'),
             'date_of_birth.required' => __('validation.required'),
             'image.mimes' => __('validation.mimes'),
-             'date_of_birth.date' => __('validation.date'),
+            'date_of_birth.date' => __('validation.date'),
             'date_of_birth.date_format' => __('validation.date_format'),
 
         ];
@@ -69,7 +73,7 @@ class UpdateProfileRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
-            makeResponse('error', $validator->errors()->first(),Response::HTTP_UNPROCESSABLE_ENTITY)
+            makeResponse('error', $validator->errors()->first(), Response::HTTP_UNPROCESSABLE_ENTITY)
         );
     }
 }

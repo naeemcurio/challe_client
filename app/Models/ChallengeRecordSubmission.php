@@ -23,6 +23,16 @@ class ChallengeRecordSubmission extends Model
         return $this->hasOne(ChallengeResult::class,'challenger_record_submission_id');
     }
 
+    public function challengeURL()
+    {
+        return $this->hasMany(ChallengeURLSubmission::class,'record_submission_id');
+    }
+
+    public function challengeAttempt()
+    {
+        return $this->belongsTo(ChallengeAttempt::class,'challenge_attempt_id');
+    }
+
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s.u',
     ];

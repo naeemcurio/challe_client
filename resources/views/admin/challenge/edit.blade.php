@@ -8,10 +8,37 @@
 
 @section('style')
     <link rel="stylesheet" href="{{asset('admin/css/jquery-ui.css')}}">
+    <link rel="stylesheet" href="{{asset('admin/css/select2(4.0.3).min.css')}}">
 
     <style>
         .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
             background: #007fff !important;
+        }
+        .select2-container .select2-selection--single{
+            height: 45px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered{
+            line-height: 45px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow{
+            height: 45px !important;
+        }
+        .select2-container--default .select2-selection--single{
+            background-color: transparent;
+            border: 1px solid rgba(68, 68, 68, 1) !important;
+            border-radius: 10px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered{
+            color: #fff !important;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+        }
+        .select2-dropdown{
+            background-color: #0c1427 !important;
+        }
+        .select2-results__option[aria-selected]{
+            color: #fff !important;
         }
     </style>
 @endsection
@@ -47,7 +74,7 @@
                             <div class="col-sm-6">
                                 <div class="mb-3 innerDashboard-inputs">
                                     <label class="form-label">{{__('challenge.price')}}</label>
-                                    <select class="form-control" name="price">
+                                    <select class="form-select" name="price">
                                         @foreach($prices as $price)
                                             <option
                                                 value="{{$price->id}}" {{$challenge->price_id == $price->id ? 'selected':''}}>{{$price->price}}</option>
@@ -77,14 +104,33 @@
                             </div><!-- Col -->
 
 
+{{--                            <div class="col-sm-6">--}}
+{{--                                <div class="mb-3 innerDashboard-inputs">--}}
+{{--                                    <label class="form-label">{{__('challenge.createdBy')}}</label>--}}
+{{--                                    <select name="createdBy" class="form-control">--}}
+{{--                                        @foreach($users as $user)--}}
+{{--                                            <option--}}
+{{--                                                value="{{$user->id}}" {{$challenge->created_by == $user->id ? 'selected':''}}>{{$user->full_name.'('.$user->nick_name.')'}}</option>--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
+{{--                            </div><!-- Col -->--}}
+
+
                             <div class="col-sm-6">
                                 <div class="mb-3 innerDashboard-inputs">
                                     <label class="form-label">{{__('challenge.createdBy')}}</label>
-                                    <select name="createdBy" class="form-control">
-                                        @foreach($users as $user)
-                                            <option
-                                                value="{{$user->id}}" {{$challenge->created_by == $user->id ? 'selected':''}}>{{$user->full_name.'('.$user->nick_name.')'}}</option>
-                                        @endforeach
+                                    <select name="createdBy" data-width="100%"
+                                            class="js-example-basic-single form-select select2-hidden-accessible createdBy">
+                                        @if(isset($selectedUser))
+                                            <option value="{{ $selectedUser->id }}" selected>
+                                                {{ $selectedUser->full_name . ' (' . $selectedUser->nick_name . ')' }}
+                                            </option>
+                                        @else
+                                            <option value="" selected disabled>{{ ucfirst(__('options.select')) }}</option>
+                                        @endif                                        {{--                                        @foreach($users as $user)--}}
+                                        {{--                                            <option value="{{$user->id}}">{{$user->full_name.'('.$user->nick_name.')'}}</option>--}}
+                                        {{--                                        @endforeach--}}
                                     </select>
                                 </div>
                             </div><!-- Col -->
@@ -93,7 +139,7 @@
                             <div class="col-sm-6">
                                 <div class="mb-3 innerDashboard-inputs">
                                     <label class="form-label">{{__('challenge.status')}}</label>
-                                    <select name="status" class="form-control">
+                                    <select name="status" class="form-select">
                                         <option
                                             value="0" {{$challenge->status == 0 ? 'selected':''}}>{{ucfirst(__('options.disapproved'))}}</option>
                                         <option
@@ -137,7 +183,7 @@
                         </div>
 
                         <div class="text-end">
-                            <a href="{{route('users.index')}}" class="primary-theme-btn createBtn redBtn">
+                            <a href="{{route('challenge.index')}}" class="primary-theme-btn createBtn redBtn">
                                 {{__('actions.cancel')}}
                             </a>
 
@@ -162,6 +208,8 @@
     <script src="{{asset('admin/js/dropify.js')}}"></script>
 
     <script src="{{asset('admin/js/jquery-ui.js')}}"></script>
+
+    <script src="{{asset('admin/js/select2(4.0.3).full.js')}}"></script>
 
     <script>
 
@@ -289,6 +337,37 @@
                             errorMsg(xhr.responseJSON.message);
                         }
                     });
+                }
+            });
+
+            $('.createdBy').select2({
+                placeholder: "{{ucfirst(__('options.select'))}}",
+                minimumInputLength: 2, // Search after typing 2 characters
+                language: {
+                    inputTooShort: function () {
+                        return "{{__('datatable.more_character')}}";
+                    }
+                },
+                ajax: {
+                    url: "{{ route('users.search') }}", // Define route to fetch data
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            search: params.term // Send search term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data.data, function (user) {
+                                return {
+                                    id: user.id,
+                                    text: user.full_name + ' (' + user.nick_name + ')'
+                                }
+                            })
+                        };
+                    },
+                    cache: true
                 }
             });
 

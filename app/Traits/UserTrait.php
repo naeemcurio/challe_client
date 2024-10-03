@@ -32,6 +32,7 @@ trait UserTrait
             'app_update' => isset($user->userNotification) ? $user->userNotification->app_update : 0,
             'new_service_available' => isset($user->userNotification) ? $user->userNotification->new_service_available : 0,
             'new_tips_available' => isset($user->userNotification) ? $user->userNotification->new_tips_available : 0,
+            'timezone' => $user->timezone,
 
             'created_at' => $user->created_at
         ];

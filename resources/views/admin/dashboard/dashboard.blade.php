@@ -6,6 +6,10 @@
 
 @endsection
 
+@section('style')
+    <link rel="stylesheet" href="{{asset('admin/css/dataTables.bootstrap5.css')}}">
+
+@endsection
 
 
 @section('content')
@@ -86,6 +90,72 @@
     </div> <!-- row -->
 
 
+    <div class="row">
+
+        <div class="col-md-12 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h6 class="card-title mb-4">{{__('users.notification').' '.__('title.listing')}}</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="dataTableExample" class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{__('users.full_name')}} </th>
+                                <th>{{__('title.type')}}</th>
+                                <th>{{__('users.action')}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            @foreach($notificationArray as $notification)
+                                <tr>
+                                    <td>{{$loop->iteration}}</td>
+                                    <td>{{$notification['full_name']}}</td>
+                                    <td>{{$notification['message']}}</td>
+
+                                    <td class="icons-td">
+                                        @if($notification['type'] == 'challenge_record_submit')
+                                            <a
+                                                href="{{route('on-going-challenge.show',['on_going_challenge'=>$notification['challenge_attempt_id']])}}"
+                                                title="{{__('actions.view')}}">
+    {{--                                           class="changeStatus"--}}
+                                                <i data-feather="eye">{{__('actions.view')}}</i>
+                                            </a>
+                                        @else
+                                            <a
+                                                href="{{route('withdraw.index')}}"
+                                                title="{{__('actions.view')}}">
+                                                {{--                                           class="changeStatus"--}}
+                                                <i data-feather="eye">{{__('actions.view')}}</i>
+                                            </a>
+                                        @endif
+                                    </td>
+
+                                </tr>
+                            @endforeach
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+@endsection
+
+
+@section('script')
+
+    @include('layout.admin.datatable_js')
 
 @endsection
 

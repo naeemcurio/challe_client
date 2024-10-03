@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DataTables\UserListing;
 use App\Helper\ImageUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -25,10 +26,11 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(UserListing $dataTable)
     {
-        $users = User::where('role_id',2)->get();
-        return view('admin.user.listing',compact('users'));
+
+        return $dataTable->render('admin.user.listing');
+
     }
 
     /**
@@ -219,5 +221,19 @@ class UserController extends Controller
             return makeResponse('error',__('response_message.delete_record_error').': '.$e,Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
+    }
+
+    public function searchUser (Request  $request)
+    {
+        $search = $request->get('search');
+        $users = User::where('full_name', 'like', '%' . $search . '%')
+            ->orWhere('nick_name', 'like', '%' . $search . '%')
+            ->select('id', 'full_name', 'nick_name')
+//            ->limit(10) // Limit the number of results
+            ->get();
+
+
+        return makeResponse('success', __('response_message.record_found'), Response::HTTP_OK,$users);
+
     }
 }

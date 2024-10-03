@@ -19,7 +19,7 @@
 @if(Request()->route()->getName() == 'users.create' ||
 Request()->route()->getName() == 'users.edit' || Request()->route()->getName() == 'challenge.create'
  || Request()->route()->getName() == 'challenge.edit' )
-<link rel="stylesheet" href="{{asset('admin/css/dropify.min.css')}}">
+    <link rel="stylesheet" href="{{asset('admin/css/dropify.min.css')}}">
 @endif
 
 <!-- Layout styles -->
@@ -36,7 +36,11 @@ Request()->route()->getName() == 'users.edit' || Request()->route()->getName() =
     .blockUI.blockMsg.blockPage h1{
         color: #ffffff !important;
     }
+
+
+
 </style>
+
 
 
 

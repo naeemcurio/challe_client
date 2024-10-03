@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('withdraw_histories', function (Blueprint $table) {
-            $table->integer('request_type')->comment('0=stripe_transfer,1=card')->default(0)->after('status');
+            $table->integer('request_type')->comment('0=stripe_transfer,1=card,2=crypto')->default(0)->after('status');
         });
     }
 

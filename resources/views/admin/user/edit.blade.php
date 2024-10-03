@@ -130,13 +130,22 @@
                         </div>
 
                         <div class="text-end">
-                            <a href="{{route('challenge.index')}}" class="btn btn-outline-danger">
+                            <a href="{{route('users.index')}}" class="btn btn-outline-danger">
                                 {{__('actions.cancel')}}
                             </a>
 
                             <button type="button" class="primary-theme-btn createBtn">
                                 {{__('actions.update')}}
                             </button>
+
+                            @if(!$user->chat || $user->chat->status == 1)
+
+                                <button type="button"
+                                        data-url="{{ route('users.start_chat', ['user' => $user]) }}"
+                                        class="primary-theme-btn startChatConfirmation">
+                                    {{ __('title.start') . ' ' . __('title.chat') }}
+                                </button>
+                            @endif
                         </div>
 
                     </form>
@@ -250,6 +259,9 @@
         </div>
     </div>
 
+    @include('admin.user.modal.start_chat_confirmation')
+
+
 @endsection
 
 
@@ -266,6 +278,64 @@
     <script>
 
         $(document).ready(function () {
+
+            $(document).on('click', '.startChatConfirmation', function () {
+                var url = $(this).data('url');
+
+                $('#start_chat_form').attr('action', url);
+                $('#start_chat_modal').modal('show');
+            });
+
+            $('#startChat').click(function () {
+                var data = $('#start_chat_form').serialize();
+                var url = $('#start_chat_form').attr('action');
+
+                $.blockUI({
+                    css: {
+                        border: 'none',
+                        padding: '15px',
+                        backgroundColor: '#000',
+                        '-webkit-border-radius': '10px',
+                        '-moz-border-radius': '10px',
+                        opacity: .5,
+                        color: '#fff'
+                    }
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: data,
+
+                    success: function (response, status, xhr) {
+                        $.unblockUI();
+                        var statusCode = xhr.status;
+
+                        if (response.result == 'success') {
+
+                            successMsg(response.message);
+                            console.log(status, response.data.url, statusCode);
+
+                            // if (statusCode == 201) {
+                            console.log(response.data.url);
+                            window.location.href = response.data.url;
+                            // }
+
+                        } else if (response.result == 'error') {
+                            errorMsg(response.message);
+                        }
+                    },
+                    error: function (data, status) {
+                        $.unblockUI();
+                        errorMsg(data.responseJSON.message);
+
+
+                    },
+
+
+                });
+            });
+
+
             $('.dob').datepicker();
             $('.createBtn').click(function () {
                 var url = $('#createForm').attr('action');

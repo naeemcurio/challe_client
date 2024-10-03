@@ -13,7 +13,15 @@ trait SocketEventTrigger
     public function eventEmit($title, $message, $userID, $notificationType, $data = null)
     {
 //        $url = "http://202.166.170.246:8081";
-        $url = "http://localhost:8081";
+
+        if(env('APP_ENV') == 'prod')
+        {
+            $url = "https://challe.pro:3001";
+        }
+        else{
+            $url = "http://localhost:3001";
+        }
+
 
 
         $options = [
@@ -50,7 +58,7 @@ trait SocketEventTrigger
     public function eventEmitForSearch($title, $message, $userID, $data )
     {
 //        $url = "http://202.166.170.246:8081";
-        $url = "http://localhost:8081";
+        $url = "https://localhost:3001";
 
 
         $options = [

@@ -44,8 +44,8 @@
                                     <td>{{$loop->iteration}}</td>
 {{--                                    <td>{{$allChallenge->challenge->title}}</td>--}}
                                     <td>{{$allChallenge->challenge->price}}</td>
-                                    <td>{{$allChallenge->challenger1->full_name}}</td>
-                                    <td>{{$allChallenge->challenger2->full_name}}</td>
+                                    <td><a href="{{route('users.edit',['user'=>$allChallenge->challenger1])}}">{{$allChallenge->challenger1->full_name}}</a></td>
+                                    <td><a href="{{route('users.edit',['user'=>$allChallenge->challenger2])}}">{{$allChallenge->challenger2->full_name}}</a></td>
                                     <td>{{$allChallenge->winner_id ? $allChallenge->winner->full_name:'N/A'}}</td>
 
                                     <td>{{$allChallenge->is_completed == 1 ? 'Completed':'Pending'}}</td>

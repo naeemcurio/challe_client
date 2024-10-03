@@ -23,4 +23,9 @@ class WaitingLounge extends Model
     {
         return $this->belongsTo(Price::class,'price_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
 }

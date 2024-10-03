@@ -59,4 +59,9 @@ class User extends Authenticatable implements WalletOperations
     {
         return $this->hasMany(UserCard::class,'user_id');
     }
+
+    public function chat()
+    {
+        return $this->hasOne(ChatRoom::class,'user_2');
+    }
 }

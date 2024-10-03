@@ -30,11 +30,13 @@ class ExecutePaymentRequest extends FormRequest
             'price_id' => 'required|exists:prices,id',
 //            'card_id' => 'required_if:type,card',
             'type' => 'required',
-            'token' => 'required_if:type,card',
+//            'token' => 'required_if:type,card',
 
             'lat' => 'required',
             'lng' => 'required',
-            'city' => 'nullable'
+            'city' => 'nullable',
+            'payment_id' => 'required_if:type,card',
+
         ];
     }
 
@@ -45,11 +47,13 @@ class ExecutePaymentRequest extends FormRequest
             'price_id' => __('challenge.price'),
 //            'card_id' => __('title.card_id'),
             'type' => __('title.type'),
-            'token' => __('title.token'),
+//            'token' => __('title.token'),
 
             'lat' => __('title.lat'),
             'lng' => __('title.lng'),
             'city' => __('title.city'),
+            'payment_id' => __('title.payment_id'),
+
         ];
     }
 
@@ -59,11 +63,12 @@ class ExecutePaymentRequest extends FormRequest
             'price_id.required' => __('validation.required'),
             'price_id.exists' => __('validation.exists'),
 //            'card_id.required' => __('validation.required'),
-            'type.required' => __('validation.required'),
-            'token.required' => __('validation.required'),
+//            'type.required' => __('validation.required'),
+            'token.required_if' => __('validation.required'),
 
             'lat.required' => __('validation.required'),
             'lng.required' => __('validation.required'),
+            'payment_id.required_if' => __('validation.required_if'),
         ];
     }
 
@@ -71,7 +76,7 @@ class ExecutePaymentRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
-            makeResponse('error', $validator->errors()->first(),Response::HTTP_UNPROCESSABLE_ENTITY)
+            makeResponse('error', $validator->errors()->first(), Response::HTTP_UNPROCESSABLE_ENTITY)
         );
     }
 }

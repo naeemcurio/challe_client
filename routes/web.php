@@ -1,16 +1,20 @@
 <?php
 
+use App\Http\Controllers\Admin\ChatController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PriceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\WaitingLoungeController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\PageController;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ChallengeController;
 use App\Http\Controllers\Admin\OnGoingChallengeController;
 use App\Http\Controllers\Admin\LeaderBoardController;
 use App\Http\Controllers\Admin\WithdrawController;
+use App\Http\Controllers\Admin\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,7 +30,7 @@ use ElephantIO\Client;
 
 Route::get('test-socket', function () {
 
-    $url = 'http://localhost:8081';
+    $url = 'http://localhost:3001';
 
     $options = [
         'transport' => 'websocket',
@@ -97,6 +101,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
         Route::get('logout', [AuthenticationController::class, 'logout_web'])->name('logoutUser');
 
         Route::resource('users',UserController::class);
+        Route::get('search-user',[UserController::class,'searchUser'])->name('users.search');
 
         Route::resource('challenge', ChallengeController::class);
         Route::post('/challenge/{challenge}/remove-image', [ChallengeController::class, 'removeImage'])->name('challenge.removeImage');
@@ -129,6 +134,18 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
 
         Route::get('add-wallet-amount',[SettingController::class,'addAmount']);
 
+        Route::get('notification-listing', [NotificationController::class,'index'])
+            ->name('notification.index');
+
+        Route::get('notifications', [NotificationController::class,'listing'])
+            ->name('notification.listing');
+        Route::get('match-making',[WaitingLoungeController::class,'index'])->name('match_making.index');
+
+        Route::get('chat',[ChatController::class,'index'])->name('chat.index');
+        Route::post('start_chat/{user}',[ChatController::class,'startChat'])->name('users.start_chat');
+        Route::get('close_chat/{user_id}',[ChatController::class,'closeChat'])->name('users.end_chat');
+
+
 
     });
 });
@@ -137,6 +154,11 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
 Route::get('php-setting',function(){
    phpinfo();
 });
+
+
+
+
+
 
 
 

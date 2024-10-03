@@ -7,32 +7,39 @@ use App\Http\Requests\Api\CancelChallengeRequest;
 use App\Http\Requests\Api\ExecuteChallengeRequest;
 use App\Http\Requests\Api\ForfeitChallengeReadyStateRequest;
 use App\Http\Requests\Api\ReadyChallengeRequest;
+use App\Http\Requests\Api\ResubmitRecordRequest;
 use App\Http\Requests\Api\SubmitRatingRequest;
 use App\Http\Requests\Api\SubmitRecordRequest;
 use App\Models\Challenge;
 use App\Models\ChallengeAttempt;
 use App\Models\ChallengeRating;
 use App\Models\ChallengeRecordSubmission;
+use App\Models\ChallengeURLSubmission;
 use App\Models\Price;
 use App\Models\ReadyLounge;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserPayment;
 use App\Models\WaitingLounge;
+use App\Notifications\ChallengeSubmitNotification;
+use App\Notifications\WithdrawRequestNotification;
 use App\Services\Api\ChallengeService;
 use App\Traits\KreaitFirebaseLaravel;
 use App\Traits\SendFirebaseNotificationTrait;
 use App\Traits\SocketEventTrigger;
 use App\Traits\UserTrait;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use ElephantIO\Client;
 use ElephantIO\Engine\SocketIO\Version2X;
+use function Kreait\Firebase\JWT\Value\make;
 
 
 class ChallengeController extends Controller
@@ -356,6 +363,14 @@ class ChallengeController extends Controller
             $saveRecord = $challengeRecordSubmission->fill(collect($request->validated())->all());
             $saveRecord->save();
 
+
+            $challengeURLSubmission = new ChallengeURLSubmission();
+            $challengeURLSubmission->record_submission_id = $saveRecord->id;
+            $challengeURLSubmission->video_url = $request->video_url;
+
+            $challengeURLSubmission->save();
+
+
             $status = 'in_challenge';
 
             if ($findChallengeAttempt->readyLounge->user_1 == Auth::user()->id) {
@@ -367,7 +382,6 @@ class ChallengeController extends Controller
                     $status = 'forfeit';
                 }
             }
-
 
 
             if (Auth::user()->id == $findChallengeAttempt->challenger_1) {
@@ -382,8 +396,6 @@ class ChallengeController extends Controller
                 $message = Auth::user()->full_name . ' ' . __('challenge_response.record_submit_body',[],'en');
                 $notificationType = 4;
                 if ($user->fcm_token) {
-
-
                     $this->recordSubmitNotification($user->fcm_token, $title, $message, $notificationType);
                 }
 
@@ -394,8 +406,6 @@ class ChallengeController extends Controller
                     $findChallengeAttempt->save();
                 }
 
-
-
             }
 
 
@@ -405,6 +415,13 @@ class ChallengeController extends Controller
             }
 
 
+
+            $users = User::where('role_id',1)->get();
+            $currentUserId = Auth::user()->id;
+            foreach($users as $user)
+            {
+                Notification::send($user, new ChallengeSubmitNotification($findChallengeAttempt,$currentUserId));
+            }
 
 
             return makeResponse('success', __('response_message.record_save'), Response::HTTP_OK, $saveRecord);
@@ -579,6 +596,28 @@ class ChallengeController extends Controller
         return makeResponse('success', __('response_message.challenge_cancel_success'), Response::HTTP_OK);
 
     }
+
+
+    public function updateRecord(ResubmitRecordRequest $request)
+    {
+        try{
+            $challengeURLSubmission = new ChallengeURLSubmission();
+            $challengeURLSubmission->record_submission_id = $request->challenge_record_submission_id;
+            $challengeURLSubmission->video_url = $request->video_url;
+
+            $challengeURLSubmission->save();
+
+            return makeResponse('success',__('response_message.record_save'),Response::HTTP_OK);
+
+
+        }
+        catch (\Exception $e)
+        {
+            return makeResponse('error',__('response_message.error_message_line')." :".$e,Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 
 }

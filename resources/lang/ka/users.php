@@ -23,6 +23,7 @@ return array (
   'provider_id' => 'პროვაიდერის ID',
   'sound' => 'ხმა',
   'special_offer' => 'Სპეციალური შეთავაზება',
+  'timezone' => 'დროის სარტყელი',
   'to' => 'რომ',
   'transaction_type' => 'გარიგების ტიპი',
   'value' => 'ღირებულება',

@@ -2,12 +2,16 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\Admin\ChatController;
 use App\Models\ReadyLounge;
 use App\Models\User;
 use App\Models\WaitingLounge;
+use App\Services\Chat\ChatService;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use PHPSocketIO\SocketIO;
@@ -38,7 +42,22 @@ class SocketConfiguration extends Command
     public function handle()
     {
         try {
-            $io = new SocketIO('8081');
+            if (env('APP_ENV') == 'prod') {
+                $context = [
+                    'ssl' => [
+                        'local_cert' => env('LOCAL_CERT'), // Path to your SSL certificate
+                        'local_pk' => env('LOCAL_PK'),     // Path to your private key
+                        'verify_peer' => false
+                    ]
+                ];
+
+                $io = new SocketIO('3001', $context);
+                $io->worker->transport = 'ssl';
+
+            }
+            else{
+                $io = new SocketIO('3001');
+            }
 
             $io->on('connection', function ($socket) use ($io) {
 //                Log::info('new user connect');
@@ -69,7 +88,7 @@ class SocketConfiguration extends Command
 //                    Log::info('done');
                 });
 
-                $socket->on('searchAgain',function($data)use($io){
+                $socket->on('searchAgain', function ($data) use ($io) {
                     $channelName = $data['user_id'] . '-search-again';
 
                     $io->emit($channelName, [
@@ -79,102 +98,308 @@ class SocketConfiguration extends Command
                     ]);
                 });
 
-//                $socket->on('wait-event', function ($data) use ($io) {
-//
-//                    if (!isset($data['waiting_lounge_id'])) {
-//                        $io->emit($data['user_id'] . '-error', [
-//                            'result' => 'error',
-//                            'message' => 'Waiting Lounge ID Not Found',
-//                            'data' => null
-//                        ]);
-//                    }
-//
-//                    Auth::loginUsingId($data['user_id']);
-//
-//                    $findRecord = WaitingLounge::where('id', $data->waiting_lounge_id)
-//                        ->where('user_id', Auth::user()->id)->first();
-//
-//                    if ($findRecord) {
-//                        if ($findRecord->status == 1) {
-//                            $readyLounge = ReadyLounge::where(function (Builder $query) {
-//                                $query->where('user_1', Auth::user()->id)
-//                                    ->where('user1_status', 0);
-//                            })
-//                                ->orWhere(function (Builder $query) {
-//                                    $query->where('user_2', Auth::user()->id)
-//                                        ->where('user2_status', 0);
-//                                })
-//                                ->first();
-//
-//                            if ($readyLounge) {
-//
-//                                if ($readyLounge->user_1 == Auth::user()->id) {
-//                                    $otherUser = User::find($readyLounge->user_2);
-//                                } elseif ($readyLounge->user_2 == Auth::user()->id) {
-//                                    $otherUser = User::find($readyLounge->user_1);
-//                                }
-//
-//                                $otherUserData = [
-//                                    'id' => $otherUser->id,
-//                                    'image' => $otherUser->image,
-//                                    'full_name' => $otherUser->full_name,
-//                                    'nick_name' => $otherUser->nick_name,
-//                                    'phone_number' => $otherUser->phone_number,
-//                                    'email' => $otherUser->email
-//                                ];
-//
-//                                $createdAt = Carbon::parse($readyLounge->created_at);
-//                                $waitingTime = $readyLounge->waiting_time; // in seconds
-//
-//                                // Calculate the expiration time
-//                                $expirationTime = $createdAt->copy()->addSeconds($waitingTime);
-//
-//                                // Get the current time
-//                                $currentTime = Carbon::now();
-//
-//                                // Calculate the remaining time in seconds
-//                                if ($currentTime->greaterThanOrEqualTo($expirationTime)) {
-//                                    // If the current time is past the expiration time, set timeLeft to 0
-//                                    $timeLeft = 0;
-//                                } else {
-//                                    // Otherwise, calculate the remaining time
-//                                    $timeLeft = $currentTime->diffInSeconds($expirationTime, false);
-//                                }
-//
-//                                $response =
-//                                    [
-//                                        'status' => 1,
-//                                        'ready_lounge_id' => $readyLounge->id,
-//                                        'otherUserData' => $otherUserData,
-//                                        'price' => $readyLounge->waitingLounge->price,
-//                                        'waiting_time' => $readyLounge->waiting_time,
-//                                        'created_at' => $createdAt->format('Y-m-d H:i:s'),
-//                                        'time_left' => $timeLeft < 0 ? 0:$timeLeft
-//                                    ];
-//
-//                                $io->emit($data['user_id'] . '-wait-response',
-//                                    $response
-//                                );
-//
-//                                $io->emit($otherUserData->id . '-wait-response',
-//                                    $response
-//                                );
-//
-//                            }
-//                        }
-//                    } else {
-//
-//                        $io->emit($data['user_id'] . '-wait-response',
-//                            [
-//                                'status' => 0,
-//                                'waiting_lounge_id' => $findRecord->id,
-//                                'price' => $findRecord->price
+                $socket->on('get-chat-history', function ($data) use ($socket, $io) {
+                    $userId = $data['user_id'];
+                    $roomName = $data['room_id'];
+
+                    // Leave previous rooms
+                    foreach ($socket->rooms as $room) {
+                        $socket->leave($room);
+                    }
+
+                    // Fetch chat history from Laravel backend
+//                    $client = new Client();
+                    try {
+//                        $response = $client->post(env('APP_URL') . '/get-chat-history', [
+//                            'form_params' => [
+//                                'room_id' => $roomName,
+//                                'user_id' => $socket->userId
 //                            ]
-//                        );
-//
+//                        ]);
+//                        $responseData = json_decode($response->getBody()->getContents(), true);
+
+                        // Manually create an instance of ChatService
+                        $chatService = new ChatService();
+
+                        // Now pass the service to the ChatController
+                        $chat = new ChatController($chatService);
+
+                        $request = new Request();
+                        $request->merge(['user_id' => $userId,'room_id'=>$roomName]);
+
+                        $response = $chat->getHistory($request);
+
+                        $responseData = $response->getData(true);
+
+
+
+                        if ($responseData['result'] === 'success') {
+                            // Join the room and send chat history
+                            $socket->join($roomName);
+                            $socket->emit('chat-history', [
+                                'result' => 'success',
+                                'message' => $responseData['message'],
+                                'data' => $responseData['data']
+                            ]);
+                        } else {
+                            $socket->emit('error', [
+                                'result' => 'error',
+                                'message' => $responseData['message'],
+                                'data' => null
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        $socket->emit('error', [
+                            'result' => 'error',
+                            'message' => 'Error fetching chat history',
+                            'data' => null
+                        ]);
+                    }
+                });
+
+                // Handle sending messages
+                $socket->on('send-message', function ($data) use ($socket, $io) {
+                    $roomName = $data['room_id'];
+                    $userId = $data['user_id'];
+
+
+                    // Leave previous rooms
+                    foreach ($socket->rooms as $room) {
+                        $socket->leave($room);
+                    }
+                    $socket->join($roomName);
+
+
+                    $clientsInRoom = $io->sockets->adapter->rooms[$roomName] ?? null;
+                    $numClients = is_array($clientsInRoom) ? count($clientsInRoom) : 0;
+
+                    $markAsRead = ($numClients === 2) ? 1 : 0;
+
+//                    dd($markAsRead,$numClients);
+
+
+//                    $client = new Client();
+                    try {
+//                        $response = $client->post(env('APP_URL') . '/send-message', [
+//                            'form_params' => [
+//                                'user_id' => $socket->userId,
+//                                'room_id' => $roomName,
+//                                'receiver_id' => $data['receiver_id'],
+//                                'message' => $data['message'],
+//                                'is_read' => $markAsRead
+//                            ]
+//                        ]);
+
+//                        $responseData = json_decode($response->getBody()->getContents(), true);
+
+                        // Manually create an instance of ChatService
+                        $chatService = new ChatService();
+
+                        // Now pass the service to the ChatController
+                        $chat = new ChatController($chatService);
+
+                        $request = new Request();
+                        $request->merge([
+                            'user_id' => $userId,
+                            'receiver_id' => $data['receiver_id'],
+                            'message' => $data['message'],
+                            'is_read' => $markAsRead,
+                            'room_id'=>$roomName,
+
+                        ]);
+
+                        $response = $chat->sendMessage($request);
+
+                        $responseData = $response->getData(true);
+
+                        if ($responseData['result'] === 'success') {
+                            // Send message to room
+                            $io->to($roomName)->emit('save-message', [
+                                'result' => 'success',
+                                'message' => $responseData['message'],
+                                'data' => $responseData['data'],
+//                                'numClients' => $numClients
+                            ]);
+
+                            $requestForList = new Request();
+                            $requestForList->merge(['user_id' => $userId]);
+
+                            $listResponse = $chat->getConversationList($requestForList);
+
+                            $listResponseData = $listResponse->getData(true);
+
+                            if ($listResponseData['result'] === 'success') {
+
+
+                                $io->emit($userId.'-conversation-list', [
+                                    'result' => 'success',
+                                    'message' => $listResponseData['message'],
+                                    'data' => $listResponseData['data']
+                                ]);
+
+                            }
+
+
+                            $requestForListReceiver = new Request();
+                            $requestForListReceiver->merge(['user_id' => $data['receiver_id']]);
+
+                            $listResponseReceiver = $chat->getConversationList($requestForListReceiver);
+
+                            $listResponseDataReceiver = $listResponseReceiver->getData(true);
+
+                            if ($listResponseDataReceiver['result'] === 'success') {
+
+
+                                $io->emit($data['receiver_id'].'-conversation-list', [
+                                    'result' => 'success',
+                                    'message' => $listResponseDataReceiver['message'],
+                                    'data' => $listResponseDataReceiver['data']
+                                ]);
+
+
+
+
+                            }
+
+
+
+
+
+
+
+                        }
+                    } catch (\Exception $e) {
+                        $socket->emit('error', [
+                            'result' => 'error',
+                            'message' => 'Error sending message',
+                            'data' => null
+                        ]);
+                    }
+                });
+
+
+                // Leave a room
+                $socket->on('leave-room', function ($data) use ($socket) {
+                    $roomName = $data['room_id'];
+                    $socket->leave($roomName);
+                    $socket->emit('leave-room-success', [
+                        'result' => 'success',
+                        'message' => 'Left room successfully'
+                    ]);
+                });
+
+
+                $socket->on('get-conversation-list', function($data) use ($socket, $io) {
+
+                    // Fetch the rooms the socket is currently in
+                    $rooms = $socket->rooms;
+
+                    // Leave all rooms
+//                    foreach ($rooms as $room) {
+//                        $socket->leave($room);
 //                    }
-//
-//                });
+
+                    // Assuming 'userId' is passed with the data or stored in socket
+                    $userId = $socket->userId ?? $data['user_id'];
+
+
+                    if (!$userId) {
+                        $socket->emit('error', [
+                            'result' => 'error',
+                            'message' => 'User ID is required',
+                            'data' => null
+                        ]);
+                        return;
+                    }
+
+                    // Fetch conversations from Laravel using the User model
+                    try {
+                        $user = User::find($userId);
+                        if (!$user) {
+                            $socket->emit('error', [
+                                'result' => 'error',
+                                'message' => 'User not found',
+                                'data' => null
+                            ]);
+                            return;
+                        }
+
+//                        $client = new Client();
+                        try {
+
+                            // Manually create an instance of ChatService
+                            $chatService = new ChatService();
+
+                            // Now pass the service to the ChatController
+                            $chat = new ChatController($chatService);
+
+                            $request = new Request();
+                            $request->merge(['user_id' => $userId]);
+
+                            $response = $chat->getConversationList($request);
+
+                            $responseData = $response->getData(true);
+
+                            if ($responseData['result'] === 'success') {
+                                // Send message to room
+                                $io->emit($userId.'-conversation-list', [
+                                    'result' => 'success',
+                                    'message' => $responseData['message'],
+                                    'data' => $responseData['data']
+                                ]);
+
+                            }
+
+
+
+                        } catch (\Exception $e) {
+                            $socket->emit('error', [
+                                'result' => 'error',
+                                'message' => 'Error sending message',
+                                'data' => null
+                            ]);
+                        }
+
+
+                    } catch (\Exception $e) {
+                        $socket->emit('error', [
+                            'result' => 'error',
+                            'message' => 'Error fetching conversation list: ' . $e->getMessage(),
+                            'data' => null
+                        ]);
+                    }
+                });
+
+
+                $socket->on('leave-all-room', function ($data) use ($socket) {
+//                    $roomName = $data['room_id'];
+//                    $socket->leave($roomName);
+
+                    $user_id = $data['user_id'];
+
+
+                    $rooms = $socket->rooms;
+
+
+                    // Leave all rooms
+                    foreach ($rooms as $room) {
+                        $socket->leave($room);
+                    }
+
+
+//                    $socket->emit($user_id.'-leave-all-rooms', [
+//                        'result' => 'success',
+//                        'message' => 'Left room successfully'
+//                    ]);
+
+                    $socket->broadcast->emit($user_id.'-leave-all-rooms',
+                         [
+                            'result' => 'success',
+                            'message' => 'Left room successfully'
+                        ]);
+
+                });
+
             });
 
             Worker::runAll();

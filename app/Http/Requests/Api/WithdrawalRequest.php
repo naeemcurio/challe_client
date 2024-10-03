@@ -35,7 +35,10 @@ class WithdrawalRequest extends FormRequest
 //            'card_expiry_month' => 'required_if:request_type,1',
 //            'card_expiry_year' => 'required_if:request_type,1',
             'withdraw_amount' => 'required_if:request_type,1',
-            'request_type' => 'nullable|in:0,1'
+            'request_type' => 'nullable|in:0,1,2',
+            'coin_type' => 'required_if:request_type,2',
+            'address' => 'required_if:request_type,2',
+            'network' => 'required_if:request_type,2',
         ];
     }
 
@@ -53,7 +56,10 @@ class WithdrawalRequest extends FormRequest
             'additional_info' => __('withdraw.additional_info'),
 
             'withdraw_amount' => __('card.withdraw_amount'),
-            'request_type' => __('title.request_type')
+            'request_type' => __('title.request_type'),
+            'coin_type' => __('title.coin_type'),
+            'address' => __('title.address'),
+            'network' => __('title.network'),
         ];
     }
 
@@ -65,12 +71,15 @@ class WithdrawalRequest extends FormRequest
 //            'expiry_month.required' => __('validation.required_if'),
 //            'expiry_year.required' => __('validation.required_if'),
 //            'cvv.required' => __('validation.required_if'),
-            'bank_name.required' => __('validation.required_if'),
-            'account_number.required' => __('validation.required_if'),
-            'additional_info.required' => __('validation.required_if'),
+            'bank_name.required_if' => __('validation.required_if'),
+            'account_number.required_if' => __('validation.required_if'),
+            'additional_info.required_if' => __('validation.required_if'),
 
             'withdraw_amount.required' => __('validation.required'),
             'request_type.in' => __('validation.in'),
+            'coin_type.required_if' => __('validation.required_if'),
+            'address.required_if' => __('validation.required'),
+            'network.required_if' => __('validation.required'),
         ];
     }
 

@@ -26,44 +26,7 @@
                         </a>
                     </div>
                     <div class="table-responsive">
-                        <table id="dataTableExample" class="table">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{__('users.full_name')}}</th>
-                                <th>{{__('users.nick_name')}}</th>
-                                <th>{{__('users.email')}}</th>
-                                <th>{{__('users.phone_number')}} </th>
-                                <th>{{__('users.wallet_amount')}} </th>
-                                <th>{{__('users.action')}}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($users as $user)
-                                <tr>
-                                    <td>{{$loop->iteration}}</td>
-                                    <td>{{$user->full_name}}</td>
-                                    <td>{{$user->nick_name}}</td>
-                                    <td>{{$user->email}}</td>
-                                    <td>{{$user->phone_number}}</td>
-                                    <td>{{$user->walletBalance}}</td>
-
-                                    <td class="icons-td">
-                                        <a title="{{__('actions.edit')}}" href="{{route('users.edit',['user'=>$user])}}">
-                                            <i data-feather="edit">{{__('actions.edit')}}</i>
-                                        </a>
-                                        <a data-url="{{route('users.destroy',['user'=>$user])}}" title="{{__('actions.delete')}}"
-                                           class="deleteRecord"
-                                           href="javascript:void(0)">
-                                            <i data-feather="trash">{{__('actions.delete')}}</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-
-
-                            </tbody>
-                        </table>
+                        {{ $dataTable->table() }}
                     </div>
                 </div>
             </div>
@@ -71,6 +34,7 @@
     </div>
 
     @include('admin.user.modal.delete_modal')
+    @include('admin.user.modal.start_chat_confirmation')
 
 
 @endsection
@@ -80,11 +44,67 @@
     {{--    <script src="{{asset('admin/js/data-table.js')}}"></script>--}}
 
     @include('layout.admin.datatable_js')
+    {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
 
 
     <script>
         $(document).ready(function () {
 
+            $(document).on('click', '.startChatConfirmation', function () {
+                var url = $(this).data('url');
+
+                $('#start_chat_form').attr('action', url);
+                $('#start_chat_modal').modal('show');
+            });
+
+            $('#startChat').click(function () {
+                var data = $('#start_chat_form').serialize();
+                var url = $('#start_chat_form').attr('action');
+
+                $.blockUI({
+                    css: {
+                        border: 'none',
+                        padding: '15px',
+                        backgroundColor: '#000',
+                        '-webkit-border-radius': '10px',
+                        '-moz-border-radius': '10px',
+                        opacity: .5,
+                        color: '#fff'
+                    }
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: data,
+
+                    success: function (response, status,xhr) {
+                        $.unblockUI();
+                        var statusCode = xhr.status;
+
+                        if (response.result == 'success') {
+
+                            successMsg(response.message);
+                            console.log(status,response.data.url,statusCode);
+
+                            // if (statusCode == 201) {
+                                console.log(response.data.url);
+                                window.location.href = response.data.url;
+                            // }
+
+                        } else if (response.result == 'error') {
+                            errorMsg(response.message);
+                        }
+                    },
+                    error: function (data, status) {
+                        $.unblockUI();
+                        errorMsg(data.responseJSON.message);
+
+
+                    },
+
+
+                });
+            });
 
             $(document).on('click', '.deleteRecord', function () {
                 var url = $(this).data('url');
@@ -116,8 +136,7 @@
 
                     success: function (response, status) {
 
-                        if(status === 'nocontent')
-                        {
+                        if (status === 'nocontent') {
                             successMsg("{{__('response_message.record_delete_success')}}");
 
                             setTimeout(function () {
@@ -137,14 +156,11 @@
                             setTimeout(function () {
                                 window.location.reload();
                             }, 1000);
-                        }
-                        else {
+                        } else {
                             $.unblockUI();
                             errorMsg(data.responseJSON.message);
                         }
                     },
-
-
 
 
                 });

@@ -7,11 +7,39 @@
 @endsection
 
 @section('style')
+    <link rel="stylesheet" href="{{asset('admin/css/select2(4.0.3).min.css')}}">
+
     <link rel="stylesheet" href="{{asset('admin/css/jquery-ui.css')}}">
 
     <style>
         .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
             background: #007fff !important;
+        }
+        .select2-container .select2-selection--single{
+            height: 45px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered{
+            line-height: 45px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow{
+            height: 45px !important;
+        }
+        .select2-container--default .select2-selection--single{
+            background-color: transparent;
+            border: 1px solid rgba(68, 68, 68, 1) !important;
+            border-radius: 10px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered{
+            color: #fff !important;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+        }
+        .select2-dropdown{
+            background-color: #0c1427 !important;
+        }
+        .select2-results__option[aria-selected]{
+            color: #fff !important;
         }
     </style>
 @endsection
@@ -32,19 +60,19 @@
                     <form id="createForm">
                         @csrf
                         <div class="row">
-{{--                            <div class="col-sm-6">--}}
-{{--                                <div class="mb-3 innerDashboard-inputs">--}}
-{{--                                    <label class="form-label">{{__('challenge.title')}}</label>--}}
-{{--                                    <input type="text" name="title" class="form-control"--}}
-{{--                                           placeholder="{{__('title.enter')}} {{__('challenge.title')}}">--}}
-{{--                                </div>--}}
-{{--                            </div><!-- Col -->--}}
+                            {{--                            <div class="col-sm-6">--}}
+                            {{--                                <div class="mb-3 innerDashboard-inputs">--}}
+                            {{--                                    <label class="form-label">{{__('challenge.title')}}</label>--}}
+                            {{--                                    <input type="text" name="title" class="form-control"--}}
+                            {{--                                           placeholder="{{__('title.enter')}} {{__('challenge.title')}}">--}}
+                            {{--                                </div>--}}
+                            {{--                            </div><!-- Col -->--}}
 
 
                             <div class="col-sm-6">
                                 <div class="mb-3 innerDashboard-inputs">
                                     <label class="form-label">{{__('challenge.price')}}</label>
-                                    <select class="form-control" name="price">
+                                    <select class="form-select" name="price">
                                         <option value="" selected disabled>Select</option>
                                         @foreach($prices as $price)
                                             <option value="{{$price->id}}">{{$price->price}}</option>
@@ -58,11 +86,12 @@
                             <div class="col-sm-6">
                                 <div class="mb-3 innerDashboard-inputs">
                                     <label class="form-label">{{__('challenge.video')}}</label>
-                                    <input  type="file" accept="video/*" name="video" class="form-control" id="videoInput">
+                                    <input type="file" accept="video/*" name="video" class="form-control"
+                                           id="videoInput">
 
                                     {{--                                    <input type="text" name="video_url" class="form-control"--}}
-{{--                                           onkeypress="return isNumberKey(event)"--}}
-{{--                                           placeholder="{{__('title.enter')}} {{__('challenge.video')}}">--}}
+                                    {{--                                           onkeypress="return isNumberKey(event)"--}}
+                                    {{--                                           placeholder="{{__('title.enter')}} {{__('challenge.video')}}">--}}
                                 </div>
                             </div><!-- Col -->
 
@@ -70,20 +99,23 @@
                             <div class="col-sm-6">
                                 <div class="mb-3 innerDashboard-inputs">
                                     <label class="form-label">{{__('challenge.createdBy')}}</label>
-                                    <select name="createdBy" class="form-control">
+                                    <select name="createdBy" data-width="100%"
+                                            class="js-example-basic-single form-select select2-hidden-accessible createdBy">
                                         <option value="" selected disabled>{{ucfirst(__('options.select'))}}</option>
-                                        @foreach($users as $user)
-                                            <option value="{{$user->id}}">{{$user->full_name.'('.$user->nick_name.')'}}</option>
-                                        @endforeach
+                                        {{--                                        @foreach($users as $user)--}}
+                                        {{--                                            <option value="{{$user->id}}">{{$user->full_name.'('.$user->nick_name.')'}}</option>--}}
+                                        {{--                                        @endforeach--}}
                                     </select>
                                 </div>
                             </div><!-- Col -->
 
 
+
+
                             <div class="col-sm-6">
                                 <div class="mb-3 innerDashboard-inputs">
                                     <label class="form-label">{{__('challenge.status')}}</label>
-                                    <select name="status" class="form-control">
+                                    <select name="status" class="form-select">
                                         <option value="0" selected>{{ucfirst(__('options.disapproved'))}}</option>
                                         <option value="1">{{ucfirst(__('options.approved'))}}</option>
                                     </select>
@@ -118,8 +150,6 @@
                             </div>
 
 
-
-
                         </div>
 
                         <div class="text-end">
@@ -147,6 +177,8 @@
     <script src="{{asset('admin/js/dropify.js')}}"></script>
 
     <script src="{{asset('admin/js/jquery-ui.js')}}"></script>
+
+    <script src="{{asset('admin/js/select2(4.0.3).full.js')}}"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/resumablejs@1.1.0/resumable.min.js"></script>
 
@@ -205,7 +237,7 @@
             {{--    readNextChunk();--}}
             {{--}--}}
 
-        $('.createBtn').click(function () {
+            $('.createBtn').click(function () {
                 // var data = $('#createForm').serialize();
                 var data = new FormData($('#createForm')[0]);
 
@@ -261,6 +293,38 @@
                 });
 
 
+            });
+
+
+            $('.createdBy').select2({
+                placeholder: "{{ucfirst(__('options.select'))}}",
+                minimumInputLength: 2, // Search after typing 2 characters
+                language: {
+                    inputTooShort: function () {
+                        return "{{__('datatable.more_character')}}";
+                    }
+                },
+                ajax: {
+                    url: "{{ route('users.search') }}", // Define route to fetch data
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            search: params.term // Send search term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data.data, function (user) {
+                                return {
+                                    id: user.id,
+                                    text: user.full_name + ' (' + user.nick_name + ')'
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                }
             });
 
         });

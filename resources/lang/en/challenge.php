@@ -3,6 +3,7 @@
 return array (
   'cancel_error' => 'Error in Cancel Challenge',
   'challenge_attempt_id' => 'Challenge Attempt ID',
+  'challenge_record_submission' => 'Challenge Record Submission',
   'comment' => 'Comment',
   'createdBy' => 'Created By',
   'description' => 'Description',

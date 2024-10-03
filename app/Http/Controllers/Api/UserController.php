@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Services\PaymentGateway\StripeService;
+use App\Services\PaymentGateway\LSPService;
 
 class UserController extends Controller
 {
@@ -57,25 +58,25 @@ class UserController extends Controller
             return makeResponse('error', __('response_message.error_in_saving_user'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        try{
-            $paymentGateway = new StripeService();
-            $createCustomer = $paymentGateway->create_customer_without_token();
-
-            if(isset($createCustomer['type']) && $createCustomer['type'] == 'error')
-            {
-                return makeResponse('error',$createCustomer['message'],$createCustomer['code']);
-            }
-
-
-            Auth::user()->stripe_customer_id = $createCustomer;
-            Auth::user()->save();
-
-        }
-        catch (\Exception $e)
-        {
-            DB::rollBack();
-            return makeResponse('error', __('response_message.error_card_save').$e, Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+//        try{
+//            $paymentGateway = new StripeService();
+//            $createCustomer = $paymentGateway->create_customer_without_token();
+//
+//            if(isset($createCustomer['type']) && $createCustomer['type'] == 'error')
+//            {
+//                return makeResponse('error',$createCustomer['message'],$createCustomer['code']);
+//            }
+//
+//
+//            Auth::user()->stripe_customer_id = $createCustomer;
+//            Auth::user()->save();
+//
+//        }
+//        catch (\Exception $e)
+//        {
+//            DB::rollBack();
+//            return makeResponse('error', __('response_message.error_card_save').$e, Response::HTTP_INTERNAL_SERVER_ERROR);
+//        }
 
 
 //        try {
@@ -149,6 +150,10 @@ class UserController extends Controller
 
         try {
             Auth::user()->default_language = $request->default_language;
+            if($request->timezone)
+            {
+                Auth::user()->timezone =  $request->timezone;
+            }
             Auth::user()->save();
 
             LaravelLocalization::setLocale(Auth::user()->default_language);

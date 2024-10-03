@@ -82,10 +82,12 @@ class ChallengeController extends Controller
 
     public function edit(Request $request, Challenge $challenge)
     {
-        $users = User::where('is_profile_complete',1)->get();
+//        $users = User::where('is_profile_complete',1)->get();
         $prices = Price::all();
 
-        return view('admin.challenge.edit', compact('challenge', 'users', 'prices'));
+        $selectedUser = User::where('id',$challenge->created_by)->first();
+
+        return view('admin.challenge.edit', compact('challenge',  'prices','selectedUser'));
     }
 
     public function update(ChallengeUpdateRequest $request, Challenge $challenge)

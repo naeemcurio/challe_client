@@ -211,4 +211,9 @@ class AuthenticationController extends Controller
         return $this->authService->deleteUserApi();
     }
 
+    public function validateUser(Request $request)
+    {
+        return response()->json(['userId' => $request->user()->id]);
+    }
+
 }

@@ -3,11 +3,16 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "start_socket": "nodemon ./node_modules/chat-socket-package/bin/www"
     },
     "devDependencies": {
         "axios": "^1.6.4",
         "laravel-vite-plugin": "^1.0.0",
         "vite": "^5.0.0"
+    },
+    "dependencies": {
+        "chat-socket-package": "^1.0.0",
+        "nodemon": "^3.1.5"
     }
 }

@@ -39,6 +39,14 @@
                 </a>
             </li>
 
+
+            <li class="nav-item {{Str::is('match_making.*',Request()->route()->getName() ) ? 'active':''}}">
+                <a href="{{route('match_making.index')}}" class="nav-link">
+                    <img src="{{asset('admin/img/ongoing.svg')}}" class="img-fluid side-bar-icons" alt="" style="width: 24px; height: 24px;">
+                    <span class="link-title">{{__('waiting_lounge.seeking_a_match')}}</span>
+                </a>
+            </li>
+
             <li class="nav-item {{Str::is('leaderBoard.*',Request()->route()->getName() ) ? 'active':''}}">
                 <a href="{{route('leaderBoard.index')}}" class="nav-link">
                     <img src="{{asset('admin/img/challenge.svg')}}" class="img-fluid side-bar-icons" alt="" style="width: 24px; height: 24px;">
@@ -65,6 +73,20 @@
                 <a href="{{route('withdraw.index')}}" class="nav-link">
                     <img src="{{asset('admin/img/pricel.svg')}}" class="img-fluid side-bar-icons" alt="" style="width: 24px; height: 24px;">
                     <span class="link-title">{{__('title.withdraw')}}</span>
+                </a>
+            </li>
+
+
+            <li class="nav-item {{Str::is('notification.*',Request()->route()->getName() ) ? 'active':''}}">
+                <a href="{{route('notification.listing')}}" class="nav-link">
+                    <img src="{{asset('admin/img/bell-icon.svg')}}" class="img-fluid side-bar-icons" alt="" style="width: 24px; height: 24px;">
+                    <span class="link-title">{{__('users.notification')}}</span>
+                </a>
+            </li>
+            <li class="nav-item {{Str::is('chat.*',Request()->route()->getName() ) ? 'active':''}}">
+                <a href="{{route('chat.index')}}" class="nav-link">
+                    <img src="{{asset('admin/img/pricel.svg')}}" class="img-fluid side-bar-icons" alt="" style="width: 24px; height: 24px;">
+                    <span class="link-title">{{__('title.chat')}}</span>
                 </a>
             </li>
 

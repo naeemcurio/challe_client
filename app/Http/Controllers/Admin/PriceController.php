@@ -44,8 +44,6 @@ class PriceController extends Controller
         Notification::send($users,new PopularPackCreateNotification($price));
 
 
-
-
         return makeResponse('success',  __('response_message.record_save'),  Response::HTTP_CREATED, $price);
     }
 

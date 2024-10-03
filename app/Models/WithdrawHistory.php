@@ -20,4 +20,10 @@ class WithdrawHistory extends Model
     {
         return $this->hasOne(WithdrawHistoryBank::class,'withdraw_history_id');
     }
+
+
+    public function cryptoDetail()
+    {
+        return $this->hasOne(WithdrawHistoryCrypto::class,'withdraw_history_id');
+    }
 }

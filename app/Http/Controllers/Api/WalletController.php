@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\WithdrawHistory;
 use App\Models\WithdrawHistoryBank;
 use App\Models\WithdrawHistoryCard;
+use App\Models\WithdrawHistoryCrypto;
+use App\Notifications\WithdrawRequestNotification;
 use App\Services\PaymentGateway\RapydService;
 use Carbon\Carbon;
 use HPWebdeveloper\LaravelPayPocket\Exceptions\WalletNotFoundException;
@@ -15,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 class WalletController extends Controller
@@ -148,7 +151,7 @@ class WalletController extends Controller
 
         DB::beginTransaction();
         if ($request->withdraw_amount > Auth::user()->walletBalance) {
-            return makeResponse('error', __('response_message.insufficient_balance_in_wallet'), Response::HTTP_UNPROCESSABLE_ENTITY);
+            return makeResponse('error', __('response_message.insufficient_balance_in_wallet'), Response::HTTP_FORBIDDEN);
         }
 
 
@@ -157,7 +160,7 @@ class WalletController extends Controller
                 'user_id' => Auth::user()->id,
                 'amount' => $request->withdraw_amount,
                 'status' => 0,
-                'request_type' => isset($request->request_type) ? $request->request_type:0
+                'request_type' => isset($request->request_type) ? $request->request_type : 0
             ]);
 
 //            Auth::user()->pay($request->withdraw_amount, 'Amount Withdrawn');
@@ -168,9 +171,8 @@ class WalletController extends Controller
 
         }
 
-        if($withdraw->request_type == 1)
-        {
-            try{
+        if ($withdraw->request_type == 1) {
+            try {
 //                $withdraw_request =  WithdrawHistoryCard::create([
 //                   'withdraw_history_id' => $withdraw->id,
 //                   'card_holder_name' => $request->card_holder_name,
@@ -180,19 +182,46 @@ class WalletController extends Controller
 //                ]);
 
 
-                $withdraw_request =  WithdrawHistoryBank::create([
+                $withdraw_request = WithdrawHistoryBank::create([
                     'withdraw_history_id' => $withdraw->id,
                     'bank_name' => $request->bank_name,
                     'account_number' => $request->account_number,
                     'additional_info' => $request->additional_info,
                 ]);
-            }
-            catch (\Exception $e)
-            {
+            } catch (\Exception $e) {
                 DB::rollBack();
-                return makeResponse('error', __('response_message.error_message_line') . ' ' . __('response_message.record'), Response::HTTP_OK);
+                return makeResponse('error', __('response_message.error_message_line') . ' ' . __('response_message.record'), Response::HTTP_INTERNAL_SERVER_ERROR);
 
             }
+
+        }
+        elseif($withdraw->request_type == 2)
+        {
+            try {
+                $withdraw_request = WithdrawHistoryCrypto::create([
+                    'withdraw_history_id' => $withdraw->id,
+                    'address' => $request->address,
+                    'coin_type' => $request->coin_type,
+                    'network' => $request->network,
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return makeResponse('error', __('response_message.error_message_line') . ' ' . __('response_message.record'), Response::HTTP_INTERNAL_SERVER_ERROR);
+
+            }
+
+        }
+
+        try {
+
+            $users = User::where('role_id',1)->get();
+            foreach($users as $user)
+            {
+                Notification::send($user, new WithdrawRequestNotification($withdraw));
+            }
+        }
+        catch (\Exception $e) {
+            return makeResponse('error', __('response_message.error_card_save') . ': ' . $e, Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
 
