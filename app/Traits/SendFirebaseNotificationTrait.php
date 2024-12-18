@@ -5,6 +5,9 @@ namespace App\Traits;
 
 
 use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use App\Services\GoogleAuthService;
 
 trait SendFirebaseNotificationTrait
 {
@@ -88,6 +91,21 @@ trait SendFirebaseNotificationTrait
     }
 
 
+    public function sendChatNotification($fcmToken,$title,$message)
+    {
+        $data = array();
+        $data ['title'] = $title;
+        $data['body'] = $message;
+
+        if ($fcmToken) {
+            $this->sendPushNotificationNew($fcmToken, $data);
+        }
+
+        return true;
+    }
+
+
+
     public function sendPushNotification($fcm, $dataBody)
     {
 
@@ -124,6 +142,51 @@ trait SendFirebaseNotificationTrait
 
 //            Log::debug($response);
 
+            return false;
+        }
+
+    }
+
+
+    public function sendPushNotificationNew($fcm, $dataBody, $notificationData = null)
+    {
+        $service = new GoogleAuthService();
+
+        $accessToken = $service->getAccessToken();
+//        dd($accessToken);
+
+        $client = new \GuzzleHttp\Client(['verify' => false]);
+
+        $request = $client->post(
+            'https://fcm.googleapis.com/v1/projects/' . env('FCM_PROJECT_ID') . '/messages:send',
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => json_encode([
+
+                    'message' => [
+                        "token" => $fcm,
+//                        "priority" => "high",
+//                        "content_available" => true,
+//                        "mutable_content" => true,
+//                        "time_to_live" => 0,
+                        "notification" => $dataBody,
+                        "data" => $dataBody
+                    ]
+                ])
+            ]
+        );
+
+        $response = $request->getBody();
+
+        $response = json_decode($response);
+
+
+        if (isset($response->name)) {
+            return true;
+        } else {
             return false;
         }
 

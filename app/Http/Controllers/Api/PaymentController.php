@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ExecutePaymentRequest;
 use App\Http\Requests\Api\LSPPaymentRequest;
+use App\Models\ChallengeLog;
+use App\Models\CryptoPayment;
 use App\Models\LspPayment;
 use App\Models\Price;
 use App\Models\UserPayment;
@@ -67,6 +69,23 @@ class PaymentController extends Controller
 
             }
 
+            if($request->type == 'crytpo')
+            {
+                $checkForPaymentStatus = CryptoPayment::where('payment_id',$request->payment_id)
+                    ->first();
+
+                if(!$checkForPaymentStatus)
+                {
+                    return makeResponse('error',__('response_message.invalid_payment_id'),Response::HTTP_FORBIDDEN);
+                }
+
+                if($checkForPaymentStatus->status != 3)
+                {
+                    return makeResponse('error',__('response_message.incomplete_payment'),Response::HTTP_PAYMENT_REQUIRED);
+                }
+
+            }
+
             $savePayment = new UserPayment();
 
             $savePayment->user_id = Auth::user()->id;
@@ -109,6 +128,8 @@ class PaymentController extends Controller
 //        $savePayment->payment_id = isset($executePayment) ? $executePayment:null;
         $savePayment->save();
 
+
+
         if($request->type == 'wallet')
         {
             Auth::user()->pay((float)$savePayment->amount,  "Paying Price of Starting Challenge: ".$request->price_id);
@@ -133,7 +154,7 @@ class PaymentController extends Controller
 //        return makeResponse('success',__('response_message.payment_success'),Response::HTTP_OK,$data);
     }
 
-    public function lspPayment(LSPPaymentRequest $request)
+    public function  lspPayment(LSPPaymentRequest $request)
     {
         DB::beginTransaction();
 

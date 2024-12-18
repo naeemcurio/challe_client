@@ -5,6 +5,7 @@ namespace App\Services\Api;
 
 use App\Models\Challenge;
 use App\Models\ChallengeAttempt;
+use App\Models\ChallengeLog;
 use App\Models\ChallengeRating;
 use App\Models\Price;
 use App\Models\ReadyLounge;
@@ -350,6 +351,21 @@ class ChallengeService
 
             }
 
+            try{
+                $challengeLog = ChallengeLog::create([
+                    'waiting_lounge_id' => $wait->id,
+                    'price' => $getPayment->amount,
+                    'challenge_name' => $getPayment->price->title,
+                    'waiting_date' => Carbon::now(),
+                    'search_user_name' => Auth::user()->full_name .'( '.Auth::user()->email.')',
+                    'status' => 0
+                ]);
+            }
+            catch (\Exception $e)
+            {
+                DB::rollBack();
+                return makeResponse('error','Error in Saving Challenge Log: '.$e,Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
 
 
             $sendEvent = $this->eventEmit($title, $message, Auth::user()->id, $notificationType);

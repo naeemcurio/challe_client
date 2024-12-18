@@ -21361,7 +21361,7 @@ div.tox .btn-group-lg > .btn-icon-text.tox-button .btn-icon-append,
 }
 .chat-wrapper .chat-aside .aside-body .tab-content .tab-pane {
   position: relative;
-  max-height: calc(100vh - 385px);
+  max-height: calc(100vh - 290px);
 }
 .chat-wrapper .chat-aside .aside-body .tab-content .tab-pane .chat-list .chat-item a > div {
   padding-top: 11px;
@@ -21695,8 +21695,8 @@ div.apexcharts-canvas .apexcharts-yaxistooltip-left:after {
 }
 div.apexcharts-canvas .apexcharts-tooltip-marker {
   /*rtl:raw:
-  margin-right: 0; 
-  margin-left: 10px; 
+  margin-right: 0;
+  margin-left: 10px;
   */
 }
 
@@ -22163,39 +22163,39 @@ span.flatpickr-weekday {
   height: auto;
 }
 
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-  line-height: 1.5;
-  padding: 0.469rem 0.8rem;
-}
-.select2-container--default .select2-selection--single .select2-selection__arrow {
-  height: 100%;
-}
-.select2-container--default .select2-selection--single .select2-selection__arrow b {
-  left: 0;
-}
+/*.select2-container--default .select2-selection--single .select2-selection__rendered {*/
+/*  line-height: 1.5;*/
+/*  padding: 0.469rem 0.8rem;*/
+/*}*/
+/*.select2-container--default .select2-selection--single .select2-selection__arrow {*/
+/*  height: 100%;*/
+/*}*/
+/*.select2-container--default .select2-selection--single .select2-selection__arrow b {*/
+/*  left: 0;*/
+/*}*/
 
-.select2-container--default .select2-selection--multiple {
-  min-height: 38px;
-}
-.select2-container--default .select2-selection--multiple .select2-selection__rendered {
-  padding: 0 6px;
-}
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-  background-color: #6571ff;
-  color: #fff;
-  border-color: #6571ff;
-  padding: 1px 8px;
-  border-radius: 0.15rem;
-  margin-top: 5px;
-}
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-  color: #fff;
-  opacity: 0.5;
-}
+/*.select2-container--default .select2-selection--multiple {*/
+/*  min-height: 38px;*/
+/*}*/
+/*.select2-container--default .select2-selection--multiple .select2-selection__rendered {*/
+/*  padding: 0 6px;*/
+/*}*/
+/*.select2-container--default .select2-selection--multiple .select2-selection__choice {*/
+/*  background-color: #6571ff;*/
+/*  color: #fff;*/
+/*  border-color: #6571ff;*/
+/*  padding: 1px 8px;*/
+/*  border-radius: 0.15rem;*/
+/*  margin-top: 5px;*/
+/*}*/
+/*.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {*/
+/*  color: #fff;*/
+/*  opacity: 0.5;*/
+/*}*/
 
-.select2-container .select2-search--inline {
-  margin-top: 3px;
-}
+/*.select2-container .select2-search--inline {*/
+/*  margin-top: 3px;*/
+/*}*/
 
 .EasyMDEContainer .CodeMirror {
   background: #0c1427;
@@ -22546,7 +22546,7 @@ div.tox .tox-dialog__body {
 
 .wizard > .actions {
   /*rtl:raw:
-    text-align: left; 
+    text-align: left;
   */
 }
 
@@ -22595,4 +22595,16 @@ div.tox .tox-dialog__body {
   margin: 0;
   width: 100%;
 }
+.notificationShow{
+    overflow-y: auto;
+    max-height: 200px;
+    position: relative;
+}
+
+
+.chat-item.active {
+    background-color: #172340;
+    border-left: 4px solid #172340
+}
+
 /*# sourceMappingURL=../maps/demo2/style.css.map */

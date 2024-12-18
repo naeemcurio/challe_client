@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ChatController;
+use App\Http\Controllers\Api\CityPayController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ChallengeController as Challenge;
 use App\Http\Controllers\Api\ChallengeHistoryController;
 use App\Http\Controllers\Api\WalletController;
+use Illuminate\Support\Facades\Http;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -118,13 +121,14 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
 
         Route::get('setting',[HomeController::class,'setting'])->name('setting');
 
-
-
         Route::post('update-challenge-record',[Challenge::class,'updateRecord']);
         Route::post('/validate-user', [AuthenticationController::class, 'validateUser']);
 
         Route::post('lsp-payment',[PaymentController::class,'lspPayment']);
+        Route::post('generate-crypto-payment-link',[CityPayController::class,'generatePaymentLink']);
 
+
+        Route::get('cancel-crypto-payment',[CityPayController::class,'cancelPayment']);
     });
 });
 
@@ -138,3 +142,51 @@ Route::post('send-message',[ChatController::class,'sendMessage']);
 
 
 Route::post('lsp-webhook',[PaymentController::class,'webhook_response']);
+
+
+Route::post('crypto-callback',[CityPayController::class,'handleCallback']);
+
+//Route::post('crypto-callback', function (Request $request) {
+//
+//    \Illuminate\Support\Facades\Log::info('in callback');
+//    \Illuminate\Support\Facades\Log::info($request->all());
+//});
+
+Route::any('cancel', function (Request $request) {
+    \Illuminate\Support\Facades\Log::info('in cancel');
+    \Illuminate\Support\Facades\Log::info($request->all());
+});
+
+Route::any('success', function (Request $request) {
+    \Illuminate\Support\Facades\Log::info('in success');
+    \Illuminate\Support\Facades\Log::info($request->all());
+});
+
+
+Route::post('generate-order', function () {
+
+    $rand_number = random_int(1, 2147483647);
+
+    $response = Http::post('https://v2-listener.citypay.io/api/generateOrder', [
+        'customer_id' => '3941',
+        'access_token' => env('CITY_PAY_ACCESS_TOKEN'),
+        'order_id' => $rand_number,
+        'order_token' => $rand_number,
+        'amount' => '1.00',
+    ]);
+
+    // Handle the response
+    if ($response->successful()) {
+        return response()->json([
+            'success' => true,
+            'data' => $response->json()
+        ]);
+    }
+
+    // Handle error
+    return response()->json([
+        'success' => false,
+        'message' => 'Error in API request',
+        'error' => $response->body()
+    ], $response->status());
+});

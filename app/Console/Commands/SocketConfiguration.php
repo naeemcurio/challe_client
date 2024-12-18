@@ -7,6 +7,8 @@ use App\Models\ReadyLounge;
 use App\Models\User;
 use App\Models\WaitingLounge;
 use App\Services\Chat\ChatService;
+use App\Traits\KreaitFirebaseLaravel;
+use App\Traits\SendFirebaseNotificationTrait;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -19,6 +21,7 @@ use Workerman\Worker;
 
 class SocketConfiguration extends Command
 {
+    use SendFirebaseNotificationTrait;
     /**
      * The name and signature of the console command.
      *
@@ -259,6 +262,17 @@ class SocketConfiguration extends Command
 
 
 
+                            }
+
+                            if($numClients != 2)
+                            {
+                                $findUser = User::find($data['receiver_id']);
+                                if($findUser)
+                                {
+                                    $title = 'Message Received';
+                                    $message = 'A new message has been received';
+                                    $this->sendChatNotification($findUser->fcm_token,$title,$message);
+                                }
                             }
 
 

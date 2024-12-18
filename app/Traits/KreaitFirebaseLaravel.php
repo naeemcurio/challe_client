@@ -167,6 +167,24 @@ trait KreaitFirebaseLaravel
         return true;
     }
 
+    public function sendChatNotification($fcmToken,$title,$message)
+    {
+        if ($fcmToken) {
+            $notification = Notification::create($title, $message);
+            $data = [
+                'title' => $title,
+                'body' => $message,
+            ];
+
+            $message = CloudMessage::withTarget('token', $fcmToken)
+                ->withNotification($notification)
+                ->withData($data);
+
+            $this->sendPushNotification($message);
+        }
+
+        return true;
+    }
 
     public function sendPushNotification(CloudMessage $message)
     {

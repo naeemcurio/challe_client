@@ -31,7 +31,7 @@
                         </span>
 
                         <span class="single-title-view mb-3">
-                            {{$challengeAttempt->challenge->description}}
+                            {{$challengeAttempt->challenge->description ?? 'N/A'}}
                         </span>
 
 

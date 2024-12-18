@@ -18,6 +18,7 @@
                     <span class="link-title">{{__('admin_sidebar.dashboard')}}</span>
                 </a>
             </li>
+
             <li class="nav-item {{Str::is('users.*',Request()->route()->getName() ) ? 'active':''}}">
                 <a href="{{route('users.index')}}" class="nav-link">
                     <img src="{{asset('admin/img/users.svg')}}" class="img-fluid side-bar-icons" alt="" style="width: 24px; height: 24px;">

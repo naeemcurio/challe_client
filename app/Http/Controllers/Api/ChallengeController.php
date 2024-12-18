@@ -12,6 +12,7 @@ use App\Http\Requests\Api\SubmitRatingRequest;
 use App\Http\Requests\Api\SubmitRecordRequest;
 use App\Models\Challenge;
 use App\Models\ChallengeAttempt;
+use App\Models\ChallengeLog;
 use App\Models\ChallengeRating;
 use App\Models\ChallengeRecordSubmission;
 use App\Models\ChallengeURLSubmission;
@@ -115,6 +116,13 @@ class ChallengeController extends Controller
                 'user_2' => Auth::user()->id,
                 'waiting_lounge_id' => $findInLounge->id,
                 'waiting_time' => $waitingTime
+            ]);
+
+
+            $challengeLog = ChallengeLog::where('waiting_lounge_id',$findInLounge->id)
+            ->update([
+                'ready_date' => Carbon::now(),
+                'matched_user_name'=>Auth::user()->full_name .'( '.Auth::user()->email.' )'
             ]);
 
             DB::commit();
@@ -519,14 +527,22 @@ class ChallengeController extends Controller
 
             }
             else{
-//                Log::info('in wait delete');
-//                $waitingLoungeID->status = 2;
-//                $waitingLoungeID->save();
+
+                try{
+                    $challengeLog = ChallengeLog::where('waiting_lounge_id',$waitingLoungeID->id)
+                        ->update(['waiting_cancel_date'=>Carbon::now()]);
+                }
+                catch (\Exception $e)
+                {
+                    return makeResponse('error','Error in Saving Challenge Log: '.$e,Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
 
                 $waitingLoungeID->delete();
             }
 
             Auth::user()->deposit('wallet_1', $price->price,'Challenge Cancel');
+
+
 //            DB::commit();
 //            Log::info('delete done');
             return makeResponse('success', __('response_message.challenge_cancel_success'), Response::HTTP_OK);
