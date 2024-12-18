@@ -12,3 +12,11 @@
 [branch "workerman"]
 	remote = origin
 	merge = refs/heads/workerman
+[pull]
+	rebase = false
+[branch "challe_v2.0_without_lps"]
+	remote = origin
+	merge = refs/heads/challe_v2.0_without_lps
+[branch "challe_v2.0"]
+	remote = origin
+	merge = refs/heads/challe_v2.0
