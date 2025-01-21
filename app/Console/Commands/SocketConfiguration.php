@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\WaitingLounge;
 use App\Services\Chat\ChatService;
 use App\Traits\KreaitFirebaseLaravel;
-use App\Traits\SendFirebaseNotificationTrait;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -21,7 +20,7 @@ use Workerman\Worker;
 
 class SocketConfiguration extends Command
 {
-    use SendFirebaseNotificationTrait;
+    use KreaitFirebaseLaravel;
     /**
      * The name and signature of the console command.
      *
@@ -29,6 +28,10 @@ class SocketConfiguration extends Command
      */
     protected $signature = 'start';
 
+    public function __construct()
+    {
+        parent::__construct(); // This ensures the parent Command class is properly initialized.
+    }
 
     /**
      * The console command description.

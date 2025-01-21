@@ -21,6 +21,13 @@ class ChallengeService
     {
         if ($request->image) {
             try {
+//
+//                $file = $request->file('image');
+//                //$image=$file->getClientOriginalName();
+//                $image = time().'.'.$file->getClientOriginalExtension();
+//                $destinationPath ='upload/image/challenge/';
+//                $file->move($destinationPath,$image);
+
                 $image = ImageUploadHelper::uploadImage($request->image, 'upload/image/challenge/');
                 $challenge->image = $image;
             } catch (\Exception $e) {

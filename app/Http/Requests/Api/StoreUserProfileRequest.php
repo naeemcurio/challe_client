@@ -61,7 +61,7 @@ class StoreUserProfileRequest extends FormRequest
             'email.required' => __('validation.required'),
             'full_name.required' => __('validation.required'),
             'nick_name.required' => __('validation.required'),
-            'phone_number.required' => __('validation.required'),
+            'phone_number.nullable' => __('validation.nullable'),
             'phone_number.unique' => __('validation.unique'),
             'gender.required' => __('validation.required'),
             'image.mimes' => __('validation.mimes'),
